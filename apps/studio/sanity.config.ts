@@ -9,7 +9,7 @@ const dataset = process.env.SANITY_STUDIO_DATASET!
 
 export default defineConfig({
   name: '36warren',
-  title: 'rcmaples',
+  title: '36 Warren',
 
   projectId,
   dataset,
