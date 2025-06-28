@@ -14,12 +14,18 @@ export const entryType = defineType({
       type: 'string',
       description: 'Title or name of the entry',
       validation: (Rule) => Rule.required().min(2).max(100),
+      options: {
+        aiAssist: {
+          
+        }
+      }
     }),
     defineField({
       name: 'date',
       title: 'Date',
       type: 'datetime',
       description: 'When this entry occurred',
+      initialValue: new Date().toISOString().slice(0, 10),
       validation: (Rule) => Rule.required(),
     }),
     defineField({
