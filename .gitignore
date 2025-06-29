@@ -16,6 +16,7 @@ out
 # sanity
 /.sanity
 /dist
+dist
 
 # misc
 .DS_Store

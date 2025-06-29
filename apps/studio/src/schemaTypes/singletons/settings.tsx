@@ -9,18 +9,18 @@ export const settings = defineType({
   fields: [
     defineField({
       name: 'title',
-      description: 'This field is the title of your blog.',
+      description: 'This field is the title of your site',
       title: 'Title',
       type: 'string',
-      initialValue: 'Blog Title',
+      initialValue: 'Site Title',
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'description',
-      description: 'Used both for the <meta> description tag for SEO, and the blog subheader.',
+      description: 'Used both for the <meta> description tag for SEO, and the site subheader.',
       title: 'Description',
       type: 'array',
-      initialValue: ['Blog Description'],
+      initialValue: ['Site Description'],
       of: [
         defineArrayMember({
           type: 'block',
