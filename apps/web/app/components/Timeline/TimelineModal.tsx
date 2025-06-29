@@ -36,6 +36,10 @@ export default function TimelineModal({ selectedEntry, isOpen, onClose }: Timeli
 
   if (!isOpen || !selectedEntry) return null;
 
+  // Get images from either gallery (Sanity) or images (legacy)
+  const entryImages = (selectedEntry as any).images || [];
+  const hasImages = entryImages && entryImages.length > 0;
+
   return (
     <div
       className={`${styles['modal-overlay']} fixed inset-0 z-[100] flex items-center justify-center p-4`}
@@ -55,14 +59,16 @@ export default function TimelineModal({ selectedEntry, isOpen, onClose }: Timeli
 
         <div className={styles['modal-date']}>{selectedEntry.date}</div>
         <h2 className={styles['modal-title']}>
-          {selectedEntry.title.replace(/_/g, ' ')}
+          {(selectedEntry.name || (selectedEntry as any).title)?.replace(/_/g, ' ')}
         </h2>
 
-        {selectedEntry.images && (
-          <ImageCarousel images={selectedEntry.images} />
+        {hasImages && (
+          <ImageCarousel images={entryImages} />
         )}
 
-        <p className={styles['modal-description']}>{selectedEntry.fullDescription}</p>
+        <p className={styles['modal-description']}>
+          {selectedEntry.fullDescription}
+        </p>
       </div>
     </div>
   );
