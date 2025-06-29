@@ -2,6 +2,48 @@ import {defineQuery} from 'next-sanity'
 
 export const settingsQuery = defineQuery(`*[_type == "settings"][0]`)
 
+// Entry queries for timeline
+const entryFields = /* groq */ `
+  _id,
+  name,
+  date,
+  shortDescription,
+  fullDescription,
+  impact,
+  gallery[] {
+    asset,
+    alt,
+    hotspot,
+    crop
+  },
+  people[]-> {
+    _id,
+    name,
+    jobTitle,
+    department,
+    email,
+    avatar {
+      asset,
+      alt,
+      hotspot,
+      crop
+    }
+  }
+`
+
+export const entriesQuery = defineQuery(`
+  *[_type == "entry"] | order(date asc) {
+    ${entryFields}
+  }
+`)
+
+export const entryQuery = defineQuery(`
+  *[_type == "entry" && _id == $id][0] {
+    ${entryFields}
+  }
+`)
+
+// Legacy blog post queries (keeping for backward compatibility)
 const postFields = /* groq */ `
   _id,
   "status": select(_originalId in path("drafts.**") => "draft", "published"),

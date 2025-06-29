@@ -1,18 +1,5 @@
-export interface TimelineImage {
-  url: string;
-  caption: string;
-}
-
-export interface TimelineEntry {
-  date: string;
-  title: string;
-  description: string;
-  fullDescription: string;
-  severity: 'medium' | 'high' | 'critical';
-  images?: TimelineImage[];
-}
-
-export const timelineData: TimelineEntry[] = [
+// Legacy mock data (keeping for fallback/development)
+export const mockTimelineData = [
   {
     date: '2024.03.15',
     title: 'INITIAL_REPORT',
@@ -21,6 +8,22 @@ export const timelineData: TimelineEntry[] = [
     fullDescription:
       'Initial contact made with City Public Works Department regarding visible deterioration of storm drain infrastructure adjacent to property. Standing water observed in yard following moderate rainfall. City representative acknowledged receipt of complaint and promised inspection within 5-7 business days. Photographic evidence submitted showing early signs of drain line compromise and water pooling. Case number assigned: SW-2024-0315-001.',
     severity: 'medium',
+    people: [
+      {
+        _id: 'person1',
+        name: 'John Smith',
+        jobTitle: 'Public Works Supervisor',
+        department: 'City Public Works',
+        email: 'j.smith@city.gov'
+      },
+      {
+        _id: 'person2', 
+        name: 'Sarah Johnson',
+        jobTitle: 'Inspector',
+        department: 'Infrastructure',
+        email: 's.johnson@city.gov'
+      }
+    ],
     images: [
       {
         url: '/placeholder.svg?height=400&width=600&text=Initial+drain+deterioration',
@@ -53,6 +56,50 @@ export const timelineData: TimelineEntry[] = [
     fullDescription:
       'Following heavy rainfall, complete failure of storm drainage system resulted in catastrophic flooding of property. Basement flooded with contaminated water, causing damage to electrical systems, stored belongings, and structural elements. Foundation showed signs of water damage and potential undermining. Emergency call placed to city services resulted in delayed response. City crew arrived 6 hours after initial call, by which time damage was extensive. Crew acknowledged that earlier proper inspection could have prevented this outcome.',
     severity: 'critical',
+    people: [
+      {
+        _id: 'person1',
+        name: 'John Smith',
+        jobTitle: 'Public Works Supervisor',
+        department: 'City Public Works',
+        email: 'j.smith@city.gov'
+      },
+      {
+        _id: 'person3',
+        name: 'Mike Wilson',
+        jobTitle: 'Emergency Response Coordinator',
+        department: 'Emergency Services',
+        email: 'm.wilson@city.gov'
+      },
+      {
+        _id: 'person4',
+        name: 'Lisa Chen',
+        jobTitle: 'Structural Engineer', 
+        department: 'Engineering',
+        email: 'l.chen@city.gov'
+      },
+      {
+        _id: 'person5',
+        name: 'David Brown',
+        jobTitle: 'Property Inspector',
+        department: 'Building & Safety',
+        email: 'd.brown@city.gov'
+      },
+      {
+        _id: 'person6',
+        name: 'Amy Rodriguez',
+        jobTitle: 'Claims Adjuster',
+        department: 'Insurance',
+        email: 'a.rodriguez@insurance.com'
+      },
+      {
+        _id: 'person7',
+        name: 'Tom Anderson',
+        jobTitle: 'Contractor',
+        department: 'Emergency Repairs',
+        email: 't.anderson@repairs.com'
+      }
+    ],
     images: [
       {
         url: '/placeholder.svg?height=400&width=600&text=Flooded+basement',
@@ -111,3 +158,75 @@ export const timelineData: TimelineEntry[] = [
     severity: 'critical',
   },
 ];
+
+// Utility functions for processing Sanity data
+import { TimelineEntry } from './types';
+
+// Format date from ISO string to YYYY-MM-DD
+export function formatEntryDate(dateString: string): string {
+  try {
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0]; // Returns YYYY-MM-DD
+  } catch (error) {
+    console.warn('Invalid date format:', dateString);
+    return dateString; // Return original if parsing fails
+  }
+}
+
+// Simple image conversion without importing image utilities (to avoid build errors)
+function convertSanityImageToTimelineImage(sanityImage: any): any {
+  if (!sanityImage?.asset?._ref) {
+    return null;
+  }
+
+  try {
+    // Basic Sanity image URL construction
+    const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'mrsdi6mo';
+    const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || '36warren';
+    const assetId = sanityImage.asset._ref;
+    
+    // Extract the asset ID parts
+    const [, id, dimensions, format] = assetId.match(/image-([a-f\d]+)-(\d+x\d+)-(\w+)/) || [];
+    
+    if (id && dimensions && format) {
+      const baseUrl = `https://cdn.sanity.io/images/${projectId}/${dataset}/${id}-${dimensions}.${format}`;
+      
+      return {
+        url: `${baseUrl}?w=800&h=600&fit=max&auto=format`,
+        caption: sanityImage.alt || ''
+      };
+    }
+    
+    return null;
+  } catch (error) {
+    console.warn('Failed to process Sanity image:', error);
+    return null;
+  }
+}
+
+// Convert Sanity entry to TimelineEntry format for compatibility
+export function processSanityEntry(sanityEntry: any): TimelineEntry {
+  const processedImages = sanityEntry.gallery
+    ?.map(convertSanityImageToTimelineImage)
+    .filter(Boolean) || [];
+
+  // Process people data
+  const processedPeople = sanityEntry.people || [];
+
+  return {
+    _id: sanityEntry._id,
+    name: sanityEntry.name,
+    date: formatEntryDate(sanityEntry.date),
+    shortDescription: sanityEntry.shortDescription,
+    fullDescription: sanityEntry.fullDescription,
+    impact: sanityEntry.impact,
+    gallery: sanityEntry.gallery,
+    people: processedPeople,
+    // For backward compatibility with existing components that expect 'images'
+    images: processedImages,
+    // Map fields for backward compatibility
+    title: sanityEntry.name,
+    description: sanityEntry.shortDescription,
+    severity: sanityEntry.impact === 'low' ? 'medium' : sanityEntry.impact || 'medium'
+  } as any;
+}
