@@ -21,14 +21,12 @@ export const personType = defineType({
       title: 'Job Title',
       type: 'string',
       description: 'Current job title or role in the organization',
-      validation: (Rule) => Rule.required().min(2).max(100),
     }),
     defineField({
       name: 'department',
       title: 'Department',
       type: 'string',
       description: 'Department or division the person works in',
-      validation: (Rule) => Rule.required().min(2).max(100),
     }),
     defineField({
       name: 'phoneNumber',
@@ -46,8 +44,7 @@ export const personType = defineType({
       name: 'email',
       title: 'Email',
       type: 'string',
-      description: 'Professional email address',
-      validation: (Rule) => Rule.required().email().error('Please enter a valid email address'),
+      description: 'Email address (optional)',
     }),
     defineField({
       name: 'avatar',

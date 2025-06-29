@@ -1,8 +1,9 @@
 import {type SchemaTypeDefinition} from 'sanity'
 
-import {settings} from './singletons/settings'
-import {personType} from './documents/personType'
 import {entryType} from './documents/entryType'
+import {imageWithAlt} from './documents/imageWithAltType'
+import {personType} from './documents/personType'
+import {settings} from './singletons/settings'
 
 export const schemaTypes: SchemaTypeDefinition[] = [
   // Singletons
@@ -10,4 +11,6 @@ export const schemaTypes: SchemaTypeDefinition[] = [
   // Documents
   personType,
   entryType,
+  // Objects
+  imageWithAlt,
 ]

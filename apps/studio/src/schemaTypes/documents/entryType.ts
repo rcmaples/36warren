@@ -13,34 +13,35 @@ export const entryType = defineType({
       title: 'Name',
       type: 'string',
       description: 'Title or name of the entry',
-      validation: (Rule) => Rule.required().min(2).max(100),
-      options: {
-        aiAssist: {
-          
-        }
-      }
+      validation: (Rule) =>
+        Rule.required().min(2).max(100).error('Name must be between 2 and 100 characters'),
     }),
     defineField({
       name: 'date',
       title: 'Date',
-      type: 'datetime',
+      type: 'date',
       description: 'When this entry occurred',
       initialValue: new Date().toISOString().slice(0, 10),
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().error('Date is required'),
     }),
     defineField({
       name: 'shortDescription',
       title: 'Short Description',
       type: 'string',
       description: 'Brief summary of the entry (max 200 characters)',
-      validation: (Rule) => Rule.required().min(2).max(200),
+      validation: (Rule) =>
+        Rule.required()
+          .min(2)
+          .max(200)
+          .error('Short description must be between 2 and 200 characters'),
     }),
     defineField({
       name: 'fullDescription',
       title: 'Full Description',
       type: 'text',
       description: 'Detailed description of the entry',
-      validation: (Rule) => Rule.required().min(10),
+      validation: (Rule) =>
+        Rule.required().min(10).error('Full description must be at least 10 characters'),
       rows: 5,
     }),
     defineField({
@@ -48,7 +49,7 @@ export const entryType = defineType({
       title: 'People',
       type: 'array',
       description: 'People associated with this entry',
-      validation: (Rule) => Rule.required().min(1),
+      validation: (Rule) => Rule.required().min(1).error('At least one person is required'),
       of: [
         defineArrayMember({
           type: 'reference',
@@ -57,6 +58,40 @@ export const entryType = defineType({
             disableNew: false,
           },
         }),
+      ],
+    }),
+    defineField({
+      name: 'gallery',
+      title: 'Gallery',
+      type: 'array',
+      of: [defineArrayMember({type: 'imageWithAlt'})],
+      options: {
+        layout: 'grid',
+      },
+    }),
+    defineField({
+      name: 'supportingDocuments',
+      title: 'Supporting Documents',
+      type: 'array',
+      of: [
+        {
+          type: 'file',
+          name: 'pdfFile',
+          title: 'PDF File',
+          options: {
+            accept: 'application/pdf',
+            storeOriginalFilename: true,
+          },
+        },
+        {
+          type: 'file',
+          name: 'videoFile',
+          title: 'Video File',
+          options: {
+            accept: 'video/*',
+            storeOriginalFilename: true,
+          },
+        },
       ],
     }),
     defineField({
@@ -81,8 +116,9 @@ export const entryType = defineType({
       subtitle: 'shortDescription',
       date: 'date',
       impact: 'impact',
+      media: 'gallery.0',
     },
-    prepare({title, subtitle, date, impact}) {
+    prepare({title, subtitle, date, impact, media}) {
       return {
         title: title || 'Untitled Entry',
         subtitle: [
@@ -92,6 +128,7 @@ export const entryType = defineType({
         ]
           .filter(Boolean)
           .join(' - '),
+        media: media || DocumentTextIcon,
       }
     },
   },
