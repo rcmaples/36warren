@@ -122,7 +122,7 @@ export const entryType = defineType({
       return {
         title: title || 'Untitled Entry',
         subtitle: [
-          new Date(date).toLocaleDateString(),
+          date,
           impact ? `Impact: ${impact.charAt(0).toUpperCase() + impact.slice(1)}` : '',
           subtitle,
         ]
