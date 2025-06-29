@@ -102,6 +102,56 @@ export type Person = {
   }
 }
 
+export type ExecutiveSummary = {
+  _id: string
+  _type: 'executiveSummary'
+  _createdAt: string
+  _updatedAt: string
+  _rev: string
+  title: string
+  subtitle: string
+  caseOverview?: {
+    title?: string
+    content?: string
+  }
+  timelineSection?: {
+    title?: string
+    events?: Array<{
+      date?: string
+      description?: string
+      _key: string
+    }>
+  }
+  documentedDamages?: {
+    title?: string
+    damages?: Array<string>
+  }
+  financialImpact?: {
+    title?: string
+    items?: Array<{
+      label?: string
+      value?: string
+      _key: string
+    }>
+  }
+  municipalNegligence?: {
+    title?: string
+    items?: Array<string>
+  }
+  evidence?: {
+    title?: string
+    stats?: Array<{
+      number?: string
+      label?: string
+      _key: string
+    }>
+  }
+  conclusion?: {
+    title?: string
+    content?: string
+  }
+}
+
 export type Settings = {
   _id: string
   _type: 'settings'
@@ -418,6 +468,7 @@ export type AllSanitySchemaTypes =
   | ImageWithAlt
   | Entry
   | Person
+  | ExecutiveSummary
   | Settings
   | SanityAssistInstructionTask
   | SanityAssistTaskStatus

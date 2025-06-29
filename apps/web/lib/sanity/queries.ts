@@ -2,6 +2,20 @@ import {defineQuery} from 'next-sanity'
 
 export const settingsQuery = defineQuery(`*[_type == "settings"][0]`)
 
+export const executiveSummaryQuery = defineQuery(`
+  *[_type == "executiveSummary"][0] {
+    title,
+    subtitle,
+    caseOverview,
+    timelineSection,
+    documentedDamages,
+    financialImpact,
+    municipalNegligence,
+    evidence,
+    conclusion
+  }
+`)
+
 // Entry queries for timeline
 const entryFields = /* groq */ `
   _id,

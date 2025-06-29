@@ -46,3 +46,46 @@ export interface TimelineEntry {
 }
 
 export type ViewType = 'timeline' | 'summary';
+
+// Executive Summary types
+export interface ExecutiveSummaryData {
+  title: string;
+  subtitle: string;
+  caseOverview: {
+    title: string;
+    content: string;
+  };
+  timelineSection: {
+    title: string;
+    events: Array<{
+      date: string;
+      description: string;
+    }>;
+  };
+  documentedDamages: {
+    title: string;
+    damages: string[];
+  };
+  financialImpact: {
+    title: string;
+    items: Array<{
+      label: string;
+      value: string;
+    }>;
+  };
+  municipalNegligence: {
+    title: string;
+    items: string[];
+  };
+  evidence: {
+    title: string;
+    stats: Array<{
+      number: string;
+      label: string;
+    }>;
+  };
+  conclusion: {
+    title: string;
+    content: string;
+  };
+}
