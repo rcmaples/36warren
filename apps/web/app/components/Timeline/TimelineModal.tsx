@@ -1,44 +1,77 @@
-import { useEffect, useCallback } from 'react';
-import { TimelineEntry } from '@/lib/types';
-import ImageCarousel from './ImageCarousel';
-import styles from './Timeline.module.css';
+import {useCallback, useEffect} from 'react'
+
+import type {TimelineEntry} from '@/lib/types'
+
+import ImageCarousel from './ImageCarousel'
+import styles from './Timeline.module.css'
 
 interface TimelineModalProps {
-  selectedEntry: TimelineEntry | null;
-  isOpen: boolean;
-  onClose: () => void;
+  selectedEntry: TimelineEntry | null
+  isOpen: boolean
+  onClose: () => void
+  onNavigateNext?: () => void
+  onNavigatePrevious?: () => void
 }
 
-export default function TimelineModal({ selectedEntry, isOpen, onClose }: TimelineModalProps) {
-  const handleOverlayClick = useCallback((e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  }, [onClose]);
+// Constants
+const ESCAPE_KEY = 'Escape'
+const NAVIGATION_KEYS = {
+  ARROW_UP: 'ArrowUp',
+  ARROW_DOWN: 'ArrowDown',
+  PAGE_UP: 'PageUp',
+  PAGE_DOWN: 'PageDown',
+} as const
 
-  const handleEscapeKey = useCallback((e: KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      onClose();
-    }
-  }, [onClose]);
+export default function TimelineModal({
+  selectedEntry,
+  isOpen,
+  onClose,
+  onNavigateNext,
+  onNavigatePrevious,
+}: TimelineModalProps) {
+  const handleOverlayClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (e.target === e.currentTarget) {
+        onClose()
+      }
+    },
+    [onClose],
+  )
+
+  // Combined keyboard handler
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === ESCAPE_KEY) {
+        onClose()
+      } else if (e.key === NAVIGATION_KEYS.ARROW_UP || e.key === NAVIGATION_KEYS.PAGE_UP) {
+        e.preventDefault()
+        onNavigatePrevious?.()
+      } else if (e.key === NAVIGATION_KEYS.ARROW_DOWN || e.key === NAVIGATION_KEYS.PAGE_DOWN) {
+        e.preventDefault()
+        onNavigateNext?.()
+      }
+    },
+    [onClose, onNavigateNext, onNavigatePrevious],
+  )
 
   useEffect(() => {
     if (isOpen) {
-      document.addEventListener('keydown', handleEscapeKey);
-      document.body.style.overflow = 'hidden';
+      document.addEventListener('keydown', handleKeyDown)
+      document.body.style.overflow = 'hidden'
     }
 
     return () => {
-      document.removeEventListener('keydown', handleEscapeKey);
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen, handleEscapeKey]);
+      document.removeEventListener('keydown', handleKeyDown)
+      document.body.style.overflow = 'unset'
+    }
+  }, [isOpen, handleKeyDown])
 
-  if (!isOpen || !selectedEntry) return null;
+  if (!isOpen || !selectedEntry) return null
 
-  // Get images from either gallery (Sanity) or images (legacy)
-  const entryImages = (selectedEntry as any).images || [];
-  const hasImages = entryImages && entryImages.length > 0;
+  // Extract data with fallbacks
+  const entryImages = (selectedEntry as any).images || []
+  const hasImages = entryImages.length > 0
+  const displayTitle = (selectedEntry.name || (selectedEntry as any).title)?.replace(/_/g, ' ')
 
   return (
     <div
@@ -58,18 +91,12 @@ export default function TimelineModal({ selectedEntry, isOpen, onClose }: Timeli
         </button>
 
         <div className={styles['modal-date']}>{selectedEntry.date}</div>
-        <h2 className={styles['modal-title']}>
-          {(selectedEntry.name || (selectedEntry as any).title)?.replace(/_/g, ' ')}
-        </h2>
+        <h2 className={styles['modal-title']}>{displayTitle}</h2>
 
-        {hasImages && (
-          <ImageCarousel images={entryImages} />
-        )}
+        {hasImages && <ImageCarousel images={entryImages} />}
 
-        <p className={styles['modal-description']}>
-          {selectedEntry.fullDescription}
-        </p>
+        <p className={styles['modal-description']}>{selectedEntry.fullDescription}</p>
       </div>
     </div>
-  );
+  )
 }

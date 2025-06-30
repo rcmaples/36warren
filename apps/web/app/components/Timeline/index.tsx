@@ -1,106 +1,119 @@
-'use client';
+'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { TimelineEntry, ViewType } from '@/lib/types';
-import { processSanityEntry, mockTimelineData } from '@/lib/data';
-import TimelineItem from './TimelineItem';
-import TimelineModal from './TimelineModal';
-import ExecutiveSummary from './ExecutiveSummary';
-import styles from './Timeline.module.css';
+import {useCallback, useEffect, useMemo, useState} from 'react'
 
-export default function Timeline() {
-  const [mounted, setMounted] = useState(false);
-  const [selectedEntry, setSelectedEntry] = useState<TimelineEntry | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentView, setCurrentView] = useState<ViewType>('timeline');
-  const [timelineData, setTimelineData] = useState<TimelineEntry[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [settings, setSettings] = useState<any>(null);
+import {processSanityEntry} from '@/lib/data'
+import type {SanityPerson, TimelineEntry, ViewType} from '@/lib/types'
+
+import ExecutiveSummary from './ExecutiveSummary'
+import styles from './Timeline.module.css'
+import TimelineItem from './TimelineItem'
+import TimelineModal from './TimelineModal'
+
+interface TimelineProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  initialEntries: any[]
+  initialSettings: any
+  initialExecutiveSummary: any
+}
+
+export default function Timeline({
+  initialEntries,
+  initialSettings,
+  initialExecutiveSummary,
+}: TimelineProps) {
+  const [mounted, setMounted] = useState(false)
+  const [selectedEntry, setSelectedEntry] = useState<TimelineEntry | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [currentView, setCurrentView] = useState<ViewType>('timeline')
+  const [timelineData, setTimelineData] = useState<TimelineEntry[]>([])
+  const [settings, setSettings] = useState<any>(initialSettings)
+
   // Helper function to extract plain text from Sanity rich text
   const getDescriptionText = (description: any): string => {
-    if (!description) return '';
-    
+    if (!description) return ''
+
     // If it's already a string, return it
-    if (typeof description === 'string') return description;
-    
+    if (typeof description === 'string') return description
+
     // If it's rich text (array of blocks), extract text
     if (Array.isArray(description)) {
       return description
-        .filter(block => block._type === 'block')
-        .map(block => 
+        .filter((block) => block._type === 'block')
+        .map((block) =>
           block.children
             ?.filter((child: any) => child._type === 'span')
             .map((child: any) => child.text)
-            .join('')
+            .join(''),
         )
         .join(' ')
-        .trim();
+        .trim()
     }
-    
-    return '';
-  };
 
-  // Fetch timeline data from API
+    return ''
+  }
+
+  // Process initial data from server component
   useEffect(() => {
-    async function fetchData() {
-      try {
-        setIsLoading(true);
-        setError(null);
-        
-        // Fetch both timeline entries and settings in parallel
-        const [entriesResponse, settingsResponse] = await Promise.all([
-          fetch('/api/entries'),
-          fetch('/api/settings')
-        ]);
-        
-        const entriesData = await entriesResponse.json();
-        const settingsData = await settingsResponse.json();
-        
-        // Handle timeline data
-        if (entriesData.success && entriesData.entries && entriesData.entries.length > 0) {
-          const processedEntries = entriesData.entries.map(processSanityEntry);
-          setTimelineData(processedEntries);
-        } else {
-          // Fallback to mock data if no Sanity data available
-          console.warn('No entries found in Sanity, using mock data');
-          setTimelineData(mockTimelineData as any);
-        }
-        
-        // Handle settings data
-        if (settingsData.success && settingsData.settings) {
-          setSettings(settingsData.settings);
-        }
-      } catch (error) {
-        console.error('Failed to fetch data:', error);
-        setError('Failed to load data');
-        // Fallback to mock data on error
-        setTimelineData(mockTimelineData as any);
-      } finally {
-        setIsLoading(false);
+    try {
+      if (initialEntries && initialEntries.length > 0) {
+        const processedEntries = initialEntries.map(processSanityEntry)
+        setTimelineData(processedEntries)
+      } else {
+        // No fallback to mock data - just empty array
+        setTimelineData([])
       }
+    } catch (error) {
+      console.error('🔴 Timeline: Error processing initial data:', error)
+      // No fallback to mock data on error - just empty array
+      setTimelineData([])
     }
+  }, [initialEntries])
 
-    fetchData();
-  }, []);
+  // Update settings when initialSettings prop changes (for live updates)
+  useEffect(() => {
+    setSettings(initialSettings)
+  }, [initialSettings])
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    setMounted(true)
+  }, [])
 
   const openModal = useCallback((entry: TimelineEntry) => {
-    setSelectedEntry(entry);
-    setIsModalOpen(true);
-  }, []);
+    setSelectedEntry(entry)
+    setIsModalOpen(true)
+  }, [])
 
   const closeModal = useCallback(() => {
-    setIsModalOpen(false);
-    setSelectedEntry(null);
-  }, []);
+    setIsModalOpen(false)
+    setSelectedEntry(null)
+  }, [])
+
+  // Navigate to next timeline entry
+  const navigateToNext = useCallback(() => {
+    if (!selectedEntry || timelineData.length === 0) return
+
+    const currentIndex = timelineData.findIndex((entry) => entry._id === selectedEntry._id)
+    if (currentIndex !== -1 && currentIndex < timelineData.length - 1) {
+      const nextEntry = timelineData[currentIndex + 1]
+      setSelectedEntry(nextEntry)
+    }
+  }, [selectedEntry, timelineData])
+
+  // Navigate to previous timeline entry
+  const navigateToPrevious = useCallback(() => {
+    if (!selectedEntry || timelineData.length === 0) return
+
+    const currentIndex = timelineData.findIndex((entry) => entry._id === selectedEntry._id)
+    if (currentIndex > 0) {
+      const previousEntry = timelineData[currentIndex - 1]
+      setSelectedEntry(previousEntry)
+    }
+  }, [selectedEntry, timelineData])
 
   const switchView = useCallback((view: ViewType) => {
-    setCurrentView(view);
-  }, []);
+    setCurrentView(view)
+  }, [])
 
   const memoizedTimelineItems = useMemo(() => {
     return timelineData.map((item, index) => (
@@ -110,40 +123,11 @@ export default function Timeline() {
         index={index}
         onOpenModal={openModal}
       />
-    ));
-  }, [timelineData, openModal]);
+    ))
+  }, [timelineData, openModal])
 
   if (!mounted) {
-    return null;
-  }
-
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p>Loading timeline data...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Error state (still show interface with fallback data)
-  if (error && timelineData.length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center text-red-600">
-          <p>Error loading timeline data: {error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    );
+    return null
   }
 
   return (
@@ -151,15 +135,8 @@ export default function Timeline() {
       {/* Background */}
       <div className={`${styles['investigation-bg']} fixed inset-0 -z-10`} />
 
-      {/* Error banner if using fallback data */}
-      {error && (
-        <div className="fixed top-0 left-0 right-0 bg-yellow-100 border-b border-yellow-400 text-yellow-800 px-4 py-2 text-sm z-50">
-          <p>⚠️ Using fallback data due to loading error: {error}</p>
-        </div>
-      )}
-
       {/* Header with integrated tabs */}
-      <header className={`${styles.banner} fixed top-0 left-0 right-0 z-40 px-4 py-6`} style={{ marginTop: error ? '40px' : '0' }}>
+      <header className={`${styles.banner} fixed top-0 left-0 right-0 z-40 px-4 py-6`}>
         <div className="max-w-6xl mx-auto text-center">
           <h1 className={styles['banner-title']}>
             {settings?.title || 'STORM DRAIN INVESTIGATION'}
@@ -202,10 +179,12 @@ export default function Timeline() {
           role="tabpanel"
           aria-labelledby="timeline-tab"
           className="relative max-w-6xl mx-auto px-4 pb-20"
-          style={{ paddingTop: error ? '260px' : '200px' }}
+          style={{paddingTop: '200px'}}
         >
           {/* Central Timeline Line */}
-          <div className={`${styles['timeline-line']} absolute left-1/2 top-0 bottom-0 w-1 transform -translate-x-1/2 z-0`} />
+          <div
+            className={`${styles['timeline-line']} absolute left-1/2 top-0 bottom-0 w-1 transform -translate-x-1/2 z-0`}
+          />
 
           {/* Timeline Items */}
           <div className="relative z-10">
@@ -213,7 +192,15 @@ export default function Timeline() {
               memoizedTimelineItems
             ) : (
               <div className="text-center py-20">
-                <p className="text-gray-600">No timeline entries found.</p>
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 mx-auto max-w-md">
+                  <h3 className="text-xl font-semibold text-white mb-4">
+                    No Timeline Data Available
+                  </h3>
+                  <p className="text-gray-300">
+                    No timeline entries have been found. Please check your Sanity Studio content or
+                    contact your administrator.
+                  </p>
+                </div>
               </div>
             )}
           </div>
@@ -226,9 +213,9 @@ export default function Timeline() {
           role="tabpanel"
           aria-labelledby="summary-tab"
           className="relative"
-          style={{ paddingTop: error ? '260px' : '200px' }}
+          style={{paddingTop: '150px'}}
         >
-          <ExecutiveSummary />
+          <ExecutiveSummary initialData={initialExecutiveSummary} />
         </main>
       )}
 
@@ -237,7 +224,9 @@ export default function Timeline() {
         selectedEntry={selectedEntry}
         isOpen={isModalOpen}
         onClose={closeModal}
+        onNavigateNext={navigateToNext}
+        onNavigatePrevious={navigateToPrevious}
       />
     </div>
-  );
+  )
 }

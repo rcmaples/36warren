@@ -16,6 +16,6 @@ export const projectId = assertValue(
   'Missing environment variable: NEXT_PUBLIC_SANITY_PROJECT_ID',
 )
 
-export const apiVersion = process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2024-02-28'
+export const apiVersion = process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2025-06-30'
 
 export const studioUrl = '/studio'
