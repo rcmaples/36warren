@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import {useCallback, useState} from 'react'
 
 import type {TimelineImage} from '@/lib/types'
@@ -27,12 +28,18 @@ export default function ImageCarousel({images}: ImageCarouselProps) {
 
   return (
     <div className={styles['carousel-container']}>
-      <img
+      <Image
         src={images[currentImageIndex].url || '/placeholder.svg'}
         alt={images[currentImageIndex].caption}
+        width={800}
+        height={600}
         className={`${styles['carousel-image']} ${styles['clickable-image']}`}
         onClick={handleImageClick}
         title="Click to view full size evidence"
+        style={{
+          maxWidth: '100%',
+          height: 'auto',
+        }}
       />
 
       {images.length > 1 && (

@@ -24,14 +24,12 @@ export const convertSanityImageToTimelineImage = (
 
     // Apply crop and hotspot if available
     if (sanityImage.crop) {
-      imageBuilder
-        .crop('custom')
-        .rect(
-          sanityImage.crop.left || 0,
-          sanityImage.crop.top || 0,
-          1 - (sanityImage.crop.left || 0) - (sanityImage.crop.right || 0),
-          1 - (sanityImage.crop.top || 0) - (sanityImage.crop.bottom || 0),
-        )
+      imageBuilder.rect(
+        sanityImage.crop.left || 0,
+        sanityImage.crop.top || 0,
+        1 - (sanityImage.crop.left || 0) - (sanityImage.crop.right || 0),
+        1 - (sanityImage.crop.top || 0) - (sanityImage.crop.bottom || 0),
+      )
     }
 
     if (sanityImage.hotspot) {
@@ -68,14 +66,12 @@ export const getOptimizedImageUrl = (
 
     // Apply crop and hotspot if available
     if (sanityImage.crop) {
-      imageBuilder
-        .crop('custom')
-        .rect(
-          sanityImage.crop.left || 0,
-          sanityImage.crop.top || 0,
-          1 - (sanityImage.crop.left || 0) - (sanityImage.crop.right || 0),
-          1 - (sanityImage.crop.top || 0) - (sanityImage.crop.bottom || 0),
-        )
+      imageBuilder.rect(
+        sanityImage.crop.left || 0,
+        sanityImage.crop.top || 0,
+        1 - (sanityImage.crop.left || 0) - (sanityImage.crop.right || 0),
+        1 - (sanityImage.crop.top || 0) - (sanityImage.crop.bottom || 0),
+      )
     }
 
     if (sanityImage.hotspot) {

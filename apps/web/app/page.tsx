@@ -1,7 +1,7 @@
+import {sanityFetch} from '../lib/sanity/live'
+import {ENTRIES_QUERY, EXEC_SUMMARY_QUERY, SETTINGS_QUERY} from '../lib/sanity/queries'
 import ErrorBoundary from './components/ErrorBoundary'
 import Timeline from './components/Timeline'
-import {sanityFetch} from '../lib/sanity/live'
-import {ENTRIES_QUERY, SETTINGS_QUERY, EXEC_SUMMARY_QUERY} from '../lib/sanity/queries'
 
 export default async function Page() {
   try {

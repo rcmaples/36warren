@@ -13,13 +13,9 @@ export default function ExecutiveSummary({initialData}: ExecutiveSummaryProps) {
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    console.log('🔴 ExecutiveSummary: Processing initial data...', !!initialData)
-
     if (initialData) {
       setData(initialData)
     } else {
-      // No initial data - set to null for graceful fallback
-      console.warn('🔴 ExecutiveSummary: No initial data found')
       setData(null)
     }
   }, [initialData])
@@ -40,9 +36,12 @@ export default function ExecutiveSummary({initialData}: ExecutiveSummaryProps) {
       <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
         <div className="text-center py-20">
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 mx-auto max-w-md">
-            <h3 className="text-xl font-semibold text-white mb-4">No Executive Summary Available</h3>
+            <h3 className="text-xl font-semibold text-white mb-4">
+              No Executive Summary Available
+            </h3>
             <p className="text-gray-300">
-              No executive summary data has been found. Please check your Sanity Studio content or contact your administrator.
+              No executive summary data has been found. Please check your Sanity Studio content or
+              contact your administrator.
             </p>
           </div>
         </div>

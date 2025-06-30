@@ -3,7 +3,7 @@
 import {useCallback, useEffect, useMemo, useState} from 'react'
 
 import {processSanityEntry} from '@/lib/data'
-import type {TimelineEntry, ViewType} from '@/lib/types'
+import type {SanityPerson, TimelineEntry, ViewType} from '@/lib/types'
 
 import ExecutiveSummary from './ExecutiveSummary'
 import styles from './Timeline.module.css'
@@ -11,6 +11,7 @@ import TimelineItem from './TimelineItem'
 import TimelineModal from './TimelineModal'
 
 interface TimelineProps {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   initialEntries: any[]
   initialSettings: any
   initialExecutiveSummary: any
@@ -55,23 +56,13 @@ export default function Timeline({
   // Process initial data from server component
   useEffect(() => {
     try {
-      console.log('🔴 Timeline: Processing initial data...', {
-        entriesCount: initialEntries?.length || 0,
-        hasSettings: !!initialSettings,
-      })
-
       if (initialEntries && initialEntries.length > 0) {
         const processedEntries = initialEntries.map(processSanityEntry)
         setTimelineData(processedEntries)
-        console.log('🔴 Timeline: Processed entries:', processedEntries.length)
       } else {
-        // No fallback to mock data - just empty array
-        console.warn('🔴 Timeline: No initial entries found')
         setTimelineData([])
       }
     } catch (error) {
-      console.error('🔴 Timeline: Failed to process initial data:', error)
-      // No fallback to mock data on error - just empty array
       setTimelineData([])
     }
   }, [initialEntries, initialSettings])
@@ -172,9 +163,12 @@ export default function Timeline({
             ) : (
               <div className="text-center py-20">
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 mx-auto max-w-md">
-                  <h3 className="text-xl font-semibold text-white mb-4">No Timeline Data Available</h3>
+                  <h3 className="text-xl font-semibold text-white mb-4">
+                    No Timeline Data Available
+                  </h3>
                   <p className="text-gray-300">
-                    No timeline entries have been found. Please check your Sanity Studio content or contact your administrator.
+                    No timeline entries have been found. Please check your Sanity Studio content or
+                    contact your administrator.
                   </p>
                 </div>
               </div>

@@ -11,12 +11,19 @@ interface PeopleIndicatorsProps {
 }
 
 function PeopleIndicators({people, maxVisible = 5}: PeopleIndicatorsProps) {
-  if (!people || people.length === 0) {
+  if (!people?.length) {
     return null
   }
 
-  const visiblePeople = people.slice(0, maxVisible)
-  const remainingCount = Math.max(0, people.length - maxVisible)
+  // Filter out any invalid people entries
+  const validPeople = people.filter((person) => person?._id && person?.name)
+
+  if (!validPeople.length) {
+    return null
+  }
+
+  const visiblePeople = validPeople.slice(0, maxVisible)
+  const remainingCount = Math.max(0, validPeople.length - maxVisible)
 
   return (
     <>
