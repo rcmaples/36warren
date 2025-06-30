@@ -5,12 +5,12 @@ import {useEffect, useState} from 'react'
 import type {ExecutiveSummaryData} from '@/lib/types'
 
 interface ExecutiveSummaryProps {
-  initialData: any
+  initialData: ExecutiveSummaryData | null
 }
 
 export default function ExecutiveSummary({initialData}: ExecutiveSummaryProps) {
   const [data, setData] = useState<ExecutiveSummaryData | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading] = useState(false)
 
   useEffect(() => {
     if (initialData) {

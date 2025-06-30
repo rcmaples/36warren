@@ -6,14 +6,17 @@ export function formatEntryDate(dateString: string): string {
   try {
     const date = new Date(dateString)
     return date.toISOString().split('T')[0] // Returns YYYY-MM-DD
-  } catch (error) {
+  } catch {
     console.warn('Invalid date format:', dateString)
     return dateString // Return original if parsing fails
   }
 }
 
 // Simple image conversion without importing image utilities (to avoid build errors)
-function convertSanityImageToTimelineImage(sanityImage: any): any {
+function convertSanityImageToTimelineImage(sanityImage: {
+  asset?: {_ref?: string}
+  alt?: string
+}): {url: string; caption: string} | null {
   if (!sanityImage?.asset?._ref) {
     return null
   }
@@ -37,34 +40,36 @@ function convertSanityImageToTimelineImage(sanityImage: any): any {
     }
 
     return null
-  } catch (error) {
-    console.warn('Failed to process Sanity image:', error)
+  } catch {
+    console.warn('Failed to process Sanity image:')
     return null
   }
 }
 
 // Convert Sanity entry to TimelineEntry format for compatibility
-export function processSanityEntry(sanityEntry: any): TimelineEntry {
+export function processSanityEntry(sanityEntry: Record<string, unknown>): TimelineEntry {
   const processedImages =
-    sanityEntry.gallery?.map(convertSanityImageToTimelineImage).filter(Boolean) || []
+    (sanityEntry.gallery as {asset?: {_ref?: string}; alt?: string}[])
+      ?.map(convertSanityImageToTimelineImage)
+      .filter(Boolean) || []
 
   // Process people data
   const processedPeople = sanityEntry.people || []
 
   return {
-    _id: sanityEntry._id,
-    name: sanityEntry.name,
-    date: formatEntryDate(sanityEntry.date),
-    shortDescription: sanityEntry.shortDescription,
-    fullDescription: sanityEntry.fullDescription,
-    impact: sanityEntry.impact,
-    gallery: sanityEntry.gallery,
-    people: processedPeople,
+    _id: sanityEntry._id as string,
+    name: sanityEntry.name as string,
+    date: formatEntryDate(sanityEntry.date as string),
+    shortDescription: sanityEntry.shortDescription as string,
+    fullDescription: sanityEntry.fullDescription as string,
+    impact: sanityEntry.impact as string,
+    gallery: sanityEntry.gallery as unknown[],
+    people: processedPeople as unknown[],
     // For backward compatibility with existing components that expect 'images'
     images: processedImages,
     // Map fields for backward compatibility
-    title: sanityEntry.name,
-    description: sanityEntry.shortDescription,
-    severity: sanityEntry.impact === 'low' ? 'medium' : sanityEntry.impact || 'medium',
-  } as any
+    title: sanityEntry.name as string,
+    description: sanityEntry.shortDescription as string,
+    severity: sanityEntry.impact === 'low' ? 'medium' : (sanityEntry.impact as string) || 'medium',
+  } as TimelineEntry
 }

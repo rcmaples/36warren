@@ -25,14 +25,17 @@ const TimelineItem = React.memo(function TimelineItem({
   }
 
   // Use impact if available, fallback to severity for backward compatibility
-  const impactLevel = item.impact || (item as any).severity || 'medium'
+  const impactLevel =
+    item.impact || (item as TimelineEntry & {severity?: string}).severity || 'medium'
   const dotColor = severityColors[impactLevel as keyof typeof severityColors] || '#6b7280'
 
   // Check if item has images (either Sanity gallery or legacy images)
   const hasImages =
     (item.gallery && item.gallery.length > 0) ||
-    ((item as any).images && (item as any).images.length > 0)
-  const imageCount = item.gallery?.length || (item as any).images?.length || 0
+    ((item as TimelineEntry & {images?: unknown[]}).images &&
+      (item as TimelineEntry & {images: unknown[]}).images.length > 0)
+  const imageCount =
+    item.gallery?.length || (item as TimelineEntry & {images?: unknown[]}).images?.length || 0
 
   return (
     <div className={`${styles['timeline-item']} ${styles[index % 2 === 0 ? 'left' : 'right']}`}>
@@ -61,10 +64,10 @@ const TimelineItem = React.memo(function TimelineItem({
         )}
         <time className={`${styles['date-text']} block`}>{item.date}</time>
         <h3 className={styles['title-text']}>
-          {(item.name || (item as any).title)?.replace(/_/g, ' ')}
+          {(item.name || (item as TimelineEntry & {title?: string}).title)?.replace(/_/g, ' ')}
         </h3>
         <p className={styles['description-text']}>
-          {item.shortDescription || (item as any).description}
+          {item.shortDescription || (item as TimelineEntry & {description?: string}).description}
         </p>
 
         {/* People indicators */}

@@ -69,9 +69,11 @@ export default function TimelineModal({
   if (!isOpen || !selectedEntry) return null
 
   // Extract data with fallbacks
-  const entryImages = (selectedEntry as any).images || []
+  const entryImages = (selectedEntry as TimelineEntry & {images?: unknown[]}).images || []
   const hasImages = entryImages.length > 0
-  const displayTitle = (selectedEntry.name || (selectedEntry as any).title)?.replace(/_/g, ' ')
+  const displayTitle = (
+    selectedEntry.name || (selectedEntry as TimelineEntry & {title?: string}).title
+  )?.replace(/_/g, ' ')
 
   return (
     <div

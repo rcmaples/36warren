@@ -66,7 +66,7 @@ const PersonAvatar: React.FC<PersonAvatarProps> = ({person, size = 28}) => {
 
   const initials = getInitials(person.name)
   const backgroundColor = getAvatarColor(person.name)
-  const imageUrl = hasValidImage ? buildImageUrl(person.avatar.asset._ref) : null
+  const imageUrl = hasValidImage ? buildImageUrl(person.avatar?.asset?._ref!) : null
 
   return (
     <div

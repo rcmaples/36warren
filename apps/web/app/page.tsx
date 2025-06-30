@@ -27,7 +27,7 @@ export default async function Page() {
         </div>
       </ErrorBoundary>
     )
-  } catch (error) {
+  } catch {
     // Fallback with empty data
     return (
       <ErrorBoundary>

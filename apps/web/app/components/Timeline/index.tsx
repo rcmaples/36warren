@@ -3,7 +3,7 @@
 import {useCallback, useEffect, useMemo, useState} from 'react'
 
 import {processSanityEntry} from '@/lib/data'
-import type {SanityPerson, TimelineEntry, ViewType} from '@/lib/types'
+import type {TimelineEntry, ViewType} from '@/lib/types'
 
 import ExecutiveSummary from './ExecutiveSummary'
 import styles from './Timeline.module.css'
@@ -11,10 +11,9 @@ import TimelineItem from './TimelineItem'
 import TimelineModal from './TimelineModal'
 
 interface TimelineProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  initialEntries: any[]
-  initialSettings: any
-  initialExecutiveSummary: any
+  initialEntries: unknown[]
+  initialSettings: unknown
+  initialExecutiveSummary: unknown
 }
 
 export default function Timeline({
@@ -27,10 +26,10 @@ export default function Timeline({
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [currentView, setCurrentView] = useState<ViewType>('timeline')
   const [timelineData, setTimelineData] = useState<TimelineEntry[]>([])
-  const [settings, setSettings] = useState<any>(initialSettings)
+  const [settings, setSettings] = useState<unknown>(initialSettings)
 
   // Helper function to extract plain text from Sanity rich text
-  const getDescriptionText = (description: any): string => {
+  const getDescriptionText = (description: unknown): string => {
     if (!description) return ''
 
     // If it's already a string, return it
@@ -42,8 +41,8 @@ export default function Timeline({
         .filter((block) => block._type === 'block')
         .map((block) =>
           block.children
-            ?.filter((child: any) => child._type === 'span')
-            .map((child: any) => child.text)
+            ?.filter((child: {_type: string}) => child._type === 'span')
+            .map((child: {text: string}) => child.text)
             .join(''),
         )
         .join(' ')
@@ -139,10 +138,11 @@ export default function Timeline({
       <header className={`${styles.banner} fixed top-0 left-0 right-0 z-40 px-4 py-6`}>
         <div className="max-w-6xl mx-auto text-center">
           <h1 className={styles['banner-title']}>
-            {settings?.title || 'STORM DRAIN INVESTIGATION'}
+            {(settings as {title?: string})?.title || 'STORM DRAIN INVESTIGATION'}
           </h1>
           <p className={styles['banner-subtitle']}>
-            {getDescriptionText(settings?.description) || 'Municipal Negligence Documentation'}
+            {getDescriptionText((settings as {description?: unknown})?.description) ||
+              'Municipal Negligence Documentation'}
           </p>
 
           <nav className={styles['folder-tabs']} role="tablist" aria-label="View selection">

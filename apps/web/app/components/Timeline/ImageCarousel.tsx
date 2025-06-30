@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import React, {useCallback, useState, useEffect} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 
 import type {TimelineImage} from '@/lib/types'
 
@@ -39,7 +39,7 @@ export default function ImageCarousel({images}: ImageCarouselProps) {
   const handleKeyPress = useCallback(
     (e: KeyboardEvent) => {
       if (images.length <= 1) return
-      
+
       if (e.key === KEYBOARD_KEYS.ARROW_RIGHT) {
         e.preventDefault()
         nextImage()
@@ -81,11 +81,11 @@ export default function ImageCarousel({images}: ImageCarouselProps) {
         height={0}
         sizes="100vw"
         className={`${styles['carousel-image']} ${styles['clickable-image']} ${
-          imageOrientation === 'landscape' 
-            ? styles['image-landscape'] 
-            : imageOrientation === 'portrait' 
-            ? styles['image-portrait'] 
-            : styles['image-loading']
+          imageOrientation === 'landscape'
+            ? styles['image-landscape']
+            : imageOrientation === 'portrait'
+              ? styles['image-portrait']
+              : styles['image-loading']
         }`}
         onClick={handleImageClick}
         title="Click to view full size evidence"
