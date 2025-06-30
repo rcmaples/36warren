@@ -2,7 +2,7 @@
 
 import {useCallback, useEffect, useMemo, useState} from 'react'
 
-import {mockTimelineData, processSanityEntry} from '@/lib/data'
+import {processSanityEntry} from '@/lib/data'
 import type {TimelineEntry, ViewType} from '@/lib/types'
 
 import ExecutiveSummary from './ExecutiveSummary'
@@ -10,15 +10,24 @@ import styles from './Timeline.module.css'
 import TimelineItem from './TimelineItem'
 import TimelineModal from './TimelineModal'
 
-export default function Timeline() {
+interface TimelineProps {
+  initialEntries: any[]
+  initialSettings: any
+  initialExecutiveSummary: any
+}
+
+export default function Timeline({
+  initialEntries,
+  initialSettings,
+  initialExecutiveSummary,
+}: TimelineProps) {
   const [mounted, setMounted] = useState(false)
   const [selectedEntry, setSelectedEntry] = useState<TimelineEntry | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [currentView, setCurrentView] = useState<ViewType>('timeline')
   const [timelineData, setTimelineData] = useState<TimelineEntry[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [settings, setSettings] = useState<any>(null)
+  const [settings] = useState<any>(initialSettings)
+
   // Helper function to extract plain text from Sanity rich text
   const getDescriptionText = (description: any): string => {
     if (!description) return ''
@@ -43,48 +52,29 @@ export default function Timeline() {
     return ''
   }
 
-  // Fetch timeline data from API
+  // Process initial data from server component
   useEffect(() => {
-    async function fetchData() {
-      try {
-        setIsLoading(true)
-        setError(null)
+    try {
+      console.log('🔴 Timeline: Processing initial data...', {
+        entriesCount: initialEntries?.length || 0,
+        hasSettings: !!initialSettings,
+      })
 
-        // Fetch both timeline entries and settings in parallel
-        const [entriesResponse, settingsResponse] = await Promise.all([
-          fetch('/api/entries'),
-          fetch('/api/settings'),
-        ])
-
-        const entriesData = await entriesResponse.json()
-        const settingsData = await settingsResponse.json()
-
-        // Handle timeline data
-        if (entriesData.success && entriesData.entries && entriesData.entries.length > 0) {
-          const processedEntries = entriesData.entries.map(processSanityEntry)
-          setTimelineData(processedEntries)
-        } else {
-          // Fallback to mock data if no Sanity data available
-          console.warn('No entries found in Sanity, using mock data')
-          setTimelineData(mockTimelineData as any)
-        }
-
-        // Handle settings data
-        if (settingsData.success && settingsData.settings) {
-          setSettings(settingsData.settings)
-        }
-      } catch (error) {
-        console.error('Failed to fetch data:', error)
-        setError('Failed to load data')
-        // Fallback to mock data on error
-        setTimelineData(mockTimelineData as any)
-      } finally {
-        setIsLoading(false)
+      if (initialEntries && initialEntries.length > 0) {
+        const processedEntries = initialEntries.map(processSanityEntry)
+        setTimelineData(processedEntries)
+        console.log('🔴 Timeline: Processed entries:', processedEntries.length)
+      } else {
+        // No fallback to mock data - just empty array
+        console.warn('🔴 Timeline: No initial entries found')
+        setTimelineData([])
       }
+    } catch (error) {
+      console.error('🔴 Timeline: Failed to process initial data:', error)
+      // No fallback to mock data on error - just empty array
+      setTimelineData([])
     }
-
-    fetchData()
-  }, [])
+  }, [initialEntries, initialSettings])
 
   useEffect(() => {
     setMounted(true)
@@ -119,52 +109,13 @@ export default function Timeline() {
     return null
   }
 
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p>Loading timeline data...</p>
-        </div>
-      </div>
-    )
-  }
-
-  // Error state (still show interface with fallback data)
-  if (error && timelineData.length === 0) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center text-red-600">
-          <p>Error loading timeline data: {error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Background */}
       <div className={`${styles['investigation-bg']} fixed inset-0 -z-10`} />
 
-      {/* Error banner if using fallback data */}
-      {error && (
-        <div className="fixed top-0 left-0 right-0 bg-yellow-100 border-b border-yellow-400 text-yellow-800 px-4 py-2 text-sm z-50">
-          <p>⚠️ Using fallback data due to loading error: {error}</p>
-        </div>
-      )}
-
       {/* Header with integrated tabs */}
-      <header
-        className={`${styles.banner} fixed top-0 left-0 right-0 z-40 px-4 py-6`}
-        style={{marginTop: error ? '40px' : '0'}}
-      >
+      <header className={`${styles.banner} fixed top-0 left-0 right-0 z-40 px-4 py-6`}>
         <div className="max-w-6xl mx-auto text-center">
           <h1 className={styles['banner-title']}>
             {settings?.title || 'STORM DRAIN INVESTIGATION'}
@@ -207,7 +158,7 @@ export default function Timeline() {
           role="tabpanel"
           aria-labelledby="timeline-tab"
           className="relative max-w-6xl mx-auto px-4 pb-20"
-          style={{paddingTop: error ? '260px' : '200px'}}
+          style={{paddingTop: '200px'}}
         >
           {/* Central Timeline Line */}
           <div
@@ -220,7 +171,12 @@ export default function Timeline() {
               memoizedTimelineItems
             ) : (
               <div className="text-center py-20">
-                <p className="text-gray-600">No timeline entries found.</p>
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 mx-auto max-w-md">
+                  <h3 className="text-xl font-semibold text-white mb-4">No Timeline Data Available</h3>
+                  <p className="text-gray-300">
+                    No timeline entries have been found. Please check your Sanity Studio content or contact your administrator.
+                  </p>
+                </div>
               </div>
             )}
           </div>
@@ -233,9 +189,9 @@ export default function Timeline() {
           role="tabpanel"
           aria-labelledby="summary-tab"
           className="relative"
-          style={{paddingTop: error ? '260px' : '200px'}}
+          style={{paddingTop: '200px'}}
         >
-          <ExecutiveSummary />
+          <ExecutiveSummary initialData={initialExecutiveSummary} />
         </main>
       )}
 

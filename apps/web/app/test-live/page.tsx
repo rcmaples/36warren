@@ -1,13 +1,10 @@
 import {sanityFetch} from '../../lib/sanity/live'
-import {entriesQuery} from '../../lib/sanity/queries'
+import {ENTRIES_QUERY} from '../../lib/sanity/queries'
 
 // Simple test page to verify Live Content API
 export default async function TestLivePage() {
-  console.log('🔴 TestLivePage: Fetching with Live Content API...')
-
   try {
-    const result = await sanityFetch({query: entriesQuery})
-    console.log('🔴 Live fetch result:', result)
+    const result = await sanityFetch({query: ENTRIES_QUERY})
 
     const entries = result.data || result
 
@@ -44,8 +41,6 @@ export default async function TestLivePage() {
       </div>
     )
   } catch (error) {
-    console.error('🔴 Error in TestLivePage:', error)
-
     return (
       <div className="p-8">
         <h1 className="text-2xl font-bold mb-4">Live Content API Test - Error</h1>

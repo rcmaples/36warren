@@ -6,7 +6,7 @@ import {apiVersion, dataset, projectId} from './api'
 export const client = createClient({
   projectId,
   dataset,
-  apiVersion, // Should be 2025-01-01 (>= v2021-03-25)
+  apiVersion,
   useCdn: true,
   perspective: 'published',
 })

@@ -2,7 +2,11 @@ import {draftMode} from 'next/headers'
 import type {ClientPerspective, QueryParams} from 'next-sanity'
 
 import {client} from './client'
-import {token} from './token'
+
+const token = process.env.SANITY_API_READ_TOKEN
+if (!token) {
+  throw new Error('Missing SANITY_API_READ_TOKEN')
+}
 
 // Enhanced fetch function that works with the Live Content API infrastructure
 // When used in React Server Components, the data will be live-enabled via SanityLive component

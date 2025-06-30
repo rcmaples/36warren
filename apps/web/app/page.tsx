@@ -1,57 +1,40 @@
-'use client'
-
-import {useEffect, useState} from 'react'
-
 import ErrorBoundary from './components/ErrorBoundary'
 import Timeline from './components/Timeline'
+import {sanityFetch} from '../lib/sanity/live'
+import {ENTRIES_QUERY, SETTINGS_QUERY, EXEC_SUMMARY_QUERY} from '../lib/sanity/queries'
 
-export default function Page() {
-  const [liveStatus, setLiveStatus] = useState<any>(null)
+export default async function Page() {
+  try {
+    // Fetch timeline entries, settings, and executive summary using live-enabled sanityFetch
+    const [entriesResult, settingsResult, execSummaryResult] = await Promise.all([
+      sanityFetch({query: ENTRIES_QUERY}),
+      sanityFetch({query: SETTINGS_QUERY}),
+      sanityFetch({query: EXEC_SUMMARY_QUERY}),
+    ])
 
-  useEffect(() => {
-    // Check Live Content API status
-    fetch('/api/live-status')
-      .then((res) => res.json())
-      .then((data) => setLiveStatus(data))
-      .catch((err) => console.error('Failed to check live status:', err))
-  }, [])
+    const entries = entriesResult.data || entriesResult
+    const settings = settingsResult.data || settingsResult
+    const execSummary = execSummaryResult.data || execSummaryResult
 
-  return (
-    <ErrorBoundary>
-      {/* Live Content API Status Banner */}
-      <div className="fixed top-0 left-0 right-0 bg-green-600 text-white px-4 py-2 text-xs z-50">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <span>
-              🔴 Live Content API Status:{' '}
-              {liveStatus?.status?.isFullyConfigured ? 'Active' : 'Checking...'}
-            </span>
-            {liveStatus && (
-              <span className="text-green-200">API v{liveStatus.status?.apiVersion}</span>
-            )}
-          </div>
-          <div className="flex gap-2">
-            <a
-              href="/test-live"
-              className="bg-green-800 hover:bg-green-900 px-2 py-1 rounded text-xs transition-colors"
-            >
-              Test Live
-            </a>
-            <a
-              href="/api/live-status"
-              target="_blank"
-              className="bg-green-800 hover:bg-green-900 px-2 py-1 rounded text-xs transition-colors"
-            >
-              Debug
-            </a>
-          </div>
+    return (
+      <ErrorBoundary>
+        <div style={{marginTop: '48px'}}>
+          <Timeline
+            initialEntries={entries || []}
+            initialSettings={settings}
+            initialExecutiveSummary={execSummary}
+          />
         </div>
-      </div>
-
-      {/* Main Content with margin for banner */}
-      <div style={{marginTop: '48px'}}>
-        <Timeline />
-      </div>
-    </ErrorBoundary>
-  )
+      </ErrorBoundary>
+    )
+  } catch (error) {
+    // Fallback with empty data
+    return (
+      <ErrorBoundary>
+        <div style={{marginTop: '48px'}}>
+          <Timeline initialEntries={[]} initialSettings={null} initialExecutiveSummary={null} />
+        </div>
+      </ErrorBoundary>
+    )
+  }
 }

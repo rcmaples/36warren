@@ -1,8 +1,8 @@
 import {defineQuery} from 'next-sanity'
 
-export const settingsQuery = defineQuery(`*[_type == "settings"][0]`)
+export const SETTINGS_QUERY = defineQuery(`*[_type == "settings"][0]`)
 
-export const executiveSummaryQuery = defineQuery(`
+export const EXEC_SUMMARY_QUERY = defineQuery(`
   *[_type == "executiveSummary"][0] {
     title,
     subtitle,
@@ -17,7 +17,7 @@ export const executiveSummaryQuery = defineQuery(`
 `)
 
 // Entry queries for timeline
-const entryFields = /* groq */ `
+const ENTRY_FIELDS_QUERY = /* groq */ `
   _id,
   name,
   date,
@@ -45,20 +45,20 @@ const entryFields = /* groq */ `
   }
 `
 
-export const entriesQuery = defineQuery(`
+export const ENTRIES_QUERY = defineQuery(`
   *[_type == "entry"] | order(date asc) {
-    ${entryFields}
+    ${ENTRY_FIELDS_QUERY}
   }
 `)
 
-export const entryQuery = defineQuery(`
+export const ENTRY_QUERY = defineQuery(`
   *[_type == "entry" && _id == $id][0] {
-    ${entryFields}
+    ${ENTRY_FIELDS_QUERY}
   }
 `)
 
 // Legacy blog post queries (keeping for backward compatibility)
-const postFields = /* groq */ `
+const POST_FIELDS_QUERY = /* groq */ `
   _id,
   "status": select(_originalId in path("drafts.**") => "draft", "published"),
   "title": coalesce(title, "Untitled"),
@@ -69,22 +69,22 @@ const postFields = /* groq */ `
   "author": author->{"name": coalesce(name, "Anonymous"), picture},
 `
 
-export const heroQuery = defineQuery(`
+export const HERO_QUERY = defineQuery(`
   *[_type == "post" && defined(slug.current)] | order(date desc, _updatedAt desc) [0] {
     content,
-    ${postFields}
+    ${POST_FIELDS_QUERY}
   }
 `)
 
-export const moreStoriesQuery = defineQuery(`
+export const MORE_STORIES_QUERY = defineQuery(`
   *[_type == "post" && _id != $skip && defined(slug.current)] | order(date desc, _updatedAt desc) [0...$limit] {
-    ${postFields}
+    ${POST_FIELDS_QUERY}
   }
 `)
 
-export const postQuery = defineQuery(`
+export const POST_QUERY = defineQuery(`
   *[_type == "post" && slug.current == $slug] [0] {
     content,
-    ${postFields}
+    ${POST_FIELDS_QUERY}
   }
 `)

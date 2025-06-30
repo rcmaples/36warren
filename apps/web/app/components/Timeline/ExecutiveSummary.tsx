@@ -4,99 +4,25 @@ import {useEffect, useState} from 'react'
 
 import type {ExecutiveSummaryData} from '@/lib/types'
 
-export default function ExecutiveSummary() {
+interface ExecutiveSummaryProps {
+  initialData: any
+}
+
+export default function ExecutiveSummary({initialData}: ExecutiveSummaryProps) {
   const [data, setData] = useState<ExecutiveSummaryData | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    async function fetchExecutiveSummary() {
-      try {
-        const response = await fetch('/api/executive-summary')
-        const result = await response.json()
+    console.log('🔴 ExecutiveSummary: Processing initial data...', !!initialData)
 
-        if (result.success && result.executiveSummary) {
-          setData(result.executiveSummary)
-        } else {
-          throw new Error('Failed to load executive summary')
-        }
-      } catch (err) {
-        console.error('Error fetching executive summary:', err)
-        setError('Failed to load executive summary')
-        // Fallback to default data (your current hardcoded content)
-        setData(getDefaultData())
-      } finally {
-        setIsLoading(false)
-      }
+    if (initialData) {
+      setData(initialData)
+    } else {
+      // No initial data - set to null for graceful fallback
+      console.warn('🔴 ExecutiveSummary: No initial data found')
+      setData(null)
     }
-
-    fetchExecutiveSummary()
-  }, [])
-
-  // Fallback data function
-  function getDefaultData(): ExecutiveSummaryData {
-    return {
-      title: 'Executive Summary',
-      subtitle: 'Municipal Storm Drain Infrastructure Failure',
-      caseOverview: {
-        title: 'Case Overview',
-        content:
-          'A systematic failure of municipal storm drain infrastructure has resulted in repeated property flooding, significant financial damages, and ongoing safety hazards. Despite multiple reports and professional assessments, city officials have failed to address the root cause of the infrastructure failure.',
-      },
-      timelineSection: {
-        title: 'Timeline',
-        events: [
-          {date: 'March 2024:', description: 'Initial complaint filed'},
-          {date: 'April 2024:', description: 'Inadequate city inspection'},
-          {date: 'June 2024:', description: 'Catastrophic drainage failure'},
-          {date: 'August 2024:', description: 'Insufficient repair attempts'},
-          {date: 'September 2024:', description: 'Continued flooding events'},
-          {date: 'November 2024:', description: 'Legal action initiated'},
-        ],
-      },
-      documentedDamages: {
-        title: 'Documented Damages',
-        damages: [
-          'Basement flooding with contaminated water',
-          'Foundation structural damage',
-          'Electrical system compromise',
-          'Personal property destruction',
-          'Landscaping and yard damage',
-        ],
-      },
-      financialImpact: {
-        title: 'Financial Impact',
-        items: [
-          {label: 'Engineering Assessment:', value: '$45,000 Replacement'},
-          {label: 'Property Damage:', value: 'Ongoing'},
-          {label: 'Legal Costs:', value: 'Accumulating'},
-        ],
-      },
-      municipalNegligence: {
-        title: 'Municipal Negligence',
-        items: [
-          'Failed proper inspection',
-          'Ignored engineering recommendations',
-          'Implemented inadequate fixes',
-          'Refused to acknowledge failure',
-          'Delayed emergency response',
-        ],
-      },
-      evidence: {
-        title: 'Evidence',
-        stats: [
-          {number: '15+', label: 'Photos'},
-          {number: '6', label: 'Events'},
-          {number: '8', label: 'Months'},
-        ],
-      },
-      conclusion: {
-        title: 'Conclusion',
-        content:
-          'The evidence demonstrates a clear pattern of municipal negligence in maintaining critical infrastructure, resulting in preventable property damage. Immediate action is required to address the infrastructure failure and compensate for damages.',
-      },
-    }
-  }
+  }, [initialData])
 
   if (isLoading) {
     return (
@@ -112,8 +38,13 @@ export default function ExecutiveSummary() {
   if (!data) {
     return (
       <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-        <div className="text-center text-red-500">
-          <p>Failed to load executive summary</p>
+        <div className="text-center py-20">
+          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 mx-auto max-w-md">
+            <h3 className="text-xl font-semibold text-white mb-4">No Executive Summary Available</h3>
+            <p className="text-gray-300">
+              No executive summary data has been found. Please check your Sanity Studio content or contact your administrator.
+            </p>
+          </div>
         </div>
       </div>
     )
@@ -121,12 +52,6 @@ export default function ExecutiveSummary() {
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-      {error && (
-        <div className="mb-4 bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-2 rounded">
-          <p>⚠️ Using fallback data: {error}</p>
-        </div>
-      )}
-
       <div className="text-center mb-12">
         <h2 className="text-4xl font-black text-white mb-4 font-['Arial_Black'] tracking-wide">
           {data.title}
