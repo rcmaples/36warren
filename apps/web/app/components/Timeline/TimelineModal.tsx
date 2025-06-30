@@ -1,9 +1,18 @@
 import {useCallback, useEffect} from 'react'
 
-import type {TimelineEntry} from '@/lib/types'
+import type {TimelineEntry, TimelineImage} from '@/lib/types'
 
 import ImageCarousel from './ImageCarousel'
 import styles from './Timeline.module.css'
+
+// Type guard for TimelineImage
+function isTimelineImage(image: unknown): image is TimelineImage {
+  if (!image || typeof image !== 'object') return false
+  const img = image as Record<string, unknown>
+  return (
+    typeof img.url === 'string' && (img.caption === undefined || typeof img.caption === 'string')
+  )
+}
 
 interface TimelineModalProps {
   selectedEntry: TimelineEntry | null
@@ -68,8 +77,9 @@ export default function TimelineModal({
 
   if (!isOpen || !selectedEntry) return null
 
-  // Extract data with fallbacks
-  const entryImages = (selectedEntry as TimelineEntry & {images?: unknown[]}).images || []
+  // Extract and validate images
+  const rawImages = (selectedEntry as TimelineEntry & {images?: unknown[]}).images || []
+  const entryImages = rawImages.filter(isTimelineImage)
   const hasImages = entryImages.length > 0
   const displayTitle = (
     selectedEntry.name || (selectedEntry as TimelineEntry & {title?: string}).title

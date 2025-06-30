@@ -3,7 +3,7 @@
 import {useCallback, useEffect, useMemo, useState} from 'react'
 
 import {processSanityEntry} from '@/lib/data'
-import type {TimelineEntry, ViewType} from '@/lib/types'
+import type {TimelineEntry, ViewType, ExecutiveSummaryData} from '@/lib/types'
 
 import ExecutiveSummary from './ExecutiveSummary'
 import styles from './Timeline.module.css'
@@ -14,6 +14,34 @@ interface TimelineProps {
   initialEntries: unknown[]
   initialSettings: unknown
   initialExecutiveSummary: unknown
+}
+
+interface CaseOverview {
+  title: string
+  content: string
+}
+
+// Type guard for ExecutiveSummaryData
+function isExecutiveSummaryData(data: unknown): data is ExecutiveSummaryData {
+  if (!data || typeof data !== 'object') return false
+  const d = data as Record<string, unknown>
+  const caseOverview = d.caseOverview as CaseOverview | undefined
+
+  return (
+    typeof d.title === 'string' &&
+    typeof d.subtitle === 'string' &&
+    typeof d.caseOverview === 'object' &&
+    d.caseOverview !== null &&
+    typeof caseOverview?.title === 'string' &&
+    typeof caseOverview?.content === 'string' &&
+    // Add minimal validation for required structure
+    typeof d.timelineSection === 'object' &&
+    typeof d.documentedDamages === 'object' &&
+    typeof d.financialImpact === 'object' &&
+    typeof d.municipalNegligence === 'object' &&
+    typeof d.evidence === 'object' &&
+    typeof d.conclusion === 'object'
+  )
 }
 
 export default function Timeline({
@@ -56,7 +84,11 @@ export default function Timeline({
   useEffect(() => {
     try {
       if (initialEntries && initialEntries.length > 0) {
-        const processedEntries = initialEntries.map(processSanityEntry)
+        const processedEntries = initialEntries
+          .filter((entry): entry is Record<string, unknown> => {
+            return typeof entry === 'object' && entry !== null
+          })
+          .map(processSanityEntry)
         setTimelineData(processedEntries)
       } else {
         // No fallback to mock data - just empty array
@@ -212,10 +244,14 @@ export default function Timeline({
           id="summary-content"
           role="tabpanel"
           aria-labelledby="summary-tab"
-          className="relative"
+          className="relative max-w-7xl mx-auto px-4"
           style={{paddingTop: '150px'}}
         >
-          <ExecutiveSummary initialData={initialExecutiveSummary} />
+          <ExecutiveSummary
+            initialData={
+              isExecutiveSummaryData(initialExecutiveSummary) ? initialExecutiveSummary : null
+            }
+          />
         </main>
       )}
 
