@@ -1,6 +1,5 @@
 import './globals.css'
 
-import {SpeedInsights} from '@vercel/speed-insights/next'
 import type {Metadata} from 'next'
 
 import {SanityLive} from '../lib/sanity/live'
@@ -23,7 +22,6 @@ export default function RootLayout({
       <body className="antialiased">
         {children}
         <SanityLive />
-        <SpeedInsights />
       </body>
     </html>
   )

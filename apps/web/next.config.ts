@@ -10,8 +10,7 @@ const nextConfig: NextConfig = {
         pathname: '/images/**',
       },
     ],
-    // Remove unoptimized to enable Next.js image optimization
-    // unoptimized: true,
+    unoptimized: true,
   },
 }
 
