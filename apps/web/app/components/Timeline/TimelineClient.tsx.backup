@@ -1,0 +1,334 @@
+'use client';
+
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { TimelineEntry, ViewType, ExecutiveSummaryData } from '@/lib/types';
+import { processSanityEntry, mockTimelineData } from '@/lib/data';
+import TimelineItem from './TimelineItem';
+import TimelineModal from './TimelineModal';
+import ExecutiveSummaryComponent from './ExecutiveSummary';
+import styles from './Timeline.module.css';
+
+interface TimelineClientProps {
+  initialEntries: any[];
+  initialSettings: any;
+  initialExecutiveSummary: any;
+  error?: string;
+}
+
+export default function TimelineClient({ 
+  initialEntries, 
+  initialSettings, 
+  initialExecutiveSummary,
+  error: serverError 
+}: TimelineClientProps) {
+  const [mounted, setMounted] = useState(false);
+  const [selectedEntry, setSelectedEntry] = useState<TimelineEntry | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentView, setCurrentView] = useState<ViewType>('timeline');
+  const [timelineData, setTimelineData] = useState<TimelineEntry[]>([]);
+  const [settings, setSettings] = useState<any>(null);
+  const [executiveSummary, setExecutiveSummary] = useState<ExecutiveSummaryData | null>(null);
+
+  // Helper function to extract plain text from Sanity rich text
+  const getDescriptionText = (description: any): string => {
+    if (!description) return '';
+    
+    // If it's already a string, return it
+    if (typeof description === 'string') return description;
+    
+    // If it's rich text (array of blocks), extract text
+    if (Array.isArray(description)) {
+      return description
+        .filter(block => block._type === 'block')
+        .map(block => 
+          block.children
+            ?.filter((child: any) => child._type === 'span')
+            .map((child: any) => child.text)
+            .join('')
+        )
+        .join(' ')
+        .trim();
+    }
+    
+    return '';
+  };
+
+  // Process initial data
+  useEffect(() => {
+    try {
+      // Process timeline entries
+      if (initialEntries && initialEntries.length > 0) {
+        const processedEntries = initialEntries.map(processSanityEntry);
+        setTimelineData(processedEntries);
+      } else {
+        // Fallback to mock data if no entries
+        console.warn('No entries from server, using mock data');
+        setTimelineData(mockTimelineData as any);
+      }
+
+      // Set settings
+      if (initialSettings) {
+        setSettings(initialSettings);
+      }
+
+      // Set executive summary
+      if (initialExecutiveSummary) {
+        setExecutiveSummary(initialExecutiveSummary);
+      }
+    } catch (error) {
+      console.error('Error processing initial data:', error);
+      // Fallback to mock data
+      setTimelineData(mockTimelineData as any);
+    }
+  }, [initialEntries, initialSettings, initialExecutiveSummary]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const openModal = useCallback((entry: TimelineEntry) => {
+    setSelectedEntry(entry);
+    setIsModalOpen(true);
+  }, []);
+
+  const closeModal = useCallback(() => {
+    setIsModalOpen(false);
+    setSelectedEntry(null);
+  }, []);
+
+  const switchView = useCallback((view: ViewType) => {
+    setCurrentView(view);
+  }, []);
+
+  const memoizedTimelineItems = useMemo(() => {
+    return timelineData.map((item, index) => (
+      <TimelineItem
+        key={item._id || `${item.date}-${index}`}
+        item={item}
+        index={index}
+        onOpenModal={openModal}
+      />
+    ));
+  }, [timelineData, openModal]);
+
+  if (!mounted) {
+    return null;
+  }
+
+  return (
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Background */}
+      <div className={`${styles['investigation-bg']} fixed inset-0 -z-10`} />
+
+      {/* Error banner if there was a server error */}
+      {serverError && (
+        <div className="fixed top-0 left-0 right-0 bg-red-100 border-b border-red-400 text-red-800 px-4 py-2 text-sm z-50">
+          <p>⚠️ Live Content API Error: {serverError} (using fallback data)</p>
+        </div>
+      )}
+
+      {/* Success banner to show Live Content API is active */}
+      {!serverError && (
+        <div className="fixed top-0 left-0 right-0 bg-green-100 border-b border-green-400 text-green-800 px-4 py-2 text-sm z-50">
+          <p>🔴 Live Content API Active - Real-time updates enabled</p>
+        </div>
+      )}
+
+      {/* Header with integrated tabs */}
+      <header className={`${styles.banner} fixed top-0 left-0 right-0 z-40 px-4 py-6`} style={{ marginTop: '40px' }}>
+        <div className="max-w-6xl mx-auto text-center">
+          <h1 className={styles['banner-title']}>
+            {settings?.title || 'STORM DRAIN INVESTIGATION'}
+          </h1>
+          <p className={styles['banner-subtitle']}>
+            {getDescriptionText(settings?.description) || 'Municipal Negligence Documentation'}
+          </p>
+
+          <nav className={styles['folder-tabs']} role="tablist" aria-label="View selection">
+            <button
+              className={`${styles['folder-tab']} ${
+                currentView === 'timeline' ? styles.active : ''
+              }`}
+              onClick={() => switchView('timeline')}
+              role="tab"
+              aria-selected={currentView === 'timeline'}
+              aria-controls="timeline-content"
+            >
+              Timeline
+            </button>
+            <button
+              className={`${styles['folder-tab']} ${
+                currentView === 'summary' ? styles.active : ''
+              }`}
+              onClick={() => switchView('summary')}
+              role="tab"
+              aria-selected={currentView === 'summary'}
+              aria-controls="summary-content"
+            >
+              Executive Summary
+            </button>
+          </nav>
+        </div>
+      </header>
+
+      {/* Main Content Area */}
+      {currentView === 'timeline' && (
+        <main
+          id="timeline-content"
+          role="tabpanel"
+          aria-labelledby="timeline-tab"
+          className="relative max-w-6xl mx-auto px-4 pb-20"
+          style={{ paddingTop: '260px' }}
+        >
+          {/* Central Timeline Line */}
+          <div className={`${styles['timeline-line']} absolute left-1/2 top-0 bottom-0 w-1 transform -translate-x-1/2 z-0`} />
+
+          {/* Timeline Items */}
+          <div className="relative z-10">
+            {timelineData.length > 0 ? (
+              memoizedTimelineItems
+            ) : (
+              <div className="text-center py-20">
+                <p className="text-gray-600">No timeline entries found.</p>
+              </div>
+            )}
+          </div>
+        </main>
+      )}
+
+      {currentView === 'summary' && (
+        <main
+          id="summary-content"
+          role="tabpanel"
+          aria-labelledby="summary-tab"
+          className="relative"
+          style={{ paddingTop: '260px' }}
+        >
+          {/* Pass the executive summary data if available */}
+          {executiveSummary ? (
+            <ExecutiveSummaryStatic data={executiveSummary} />
+          ) : (
+            <ExecutiveSummaryComponent />
+          )}
+        </main>
+      )}
+
+      {/* Modal */}
+      <TimelineModal
+        selectedEntry={selectedEntry}
+        isOpen={isModalOpen}
+        onClose={closeModal}
+      />
+    </div>
+  );
+}
+
+// Static Executive Summary component that receives data as props
+function ExecutiveSummaryStatic({ data }: { data: ExecutiveSummaryData }) {
+  return (
+    <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+      <div className="text-center mb-12">
+        <h2 className="text-4xl font-black text-white mb-4 font-['Arial_Black'] tracking-wide">
+          {data.title}
+        </h2>
+        <p className="text-xl font-semibold uppercase tracking-wider text-red-500">
+          {data.subtitle}
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+        {/* Case Overview */}
+        <div className="bg-white rounded-lg p-6 shadow-lg border-l-4 border-red-500">
+          <h3 className="text-2xl font-bold text-gray-800 mb-4 font-['Arial_Black']">
+            {data.caseOverview.title}
+          </h3>
+          <p className="text-base text-gray-700 leading-relaxed">
+            {data.caseOverview.content}
+          </p>
+        </div>
+
+        {/* Timeline */}
+        <div className="bg-white rounded-lg p-6 shadow-lg border-l-4 border-red-500">
+          <h3 className="text-2xl font-bold text-gray-800 mb-4 font-['Arial_Black']">
+            {data.timelineSection.title}
+          </h3>
+          <ul className="space-y-3">
+            {data.timelineSection.events.map((event, index) => (
+              <li key={index} className="text-base text-gray-700">
+                <strong className="font-semibold text-gray-800">{event.date}</strong> {event.description}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Documented Damages */}
+        <div className="bg-white rounded-lg p-6 shadow-lg border-l-4 border-red-500">
+          <h3 className="text-2xl font-bold text-gray-800 mb-4 font-['Arial_Black']">
+            {data.documentedDamages.title}
+          </h3>
+          <ul className="space-y-2">
+            {data.documentedDamages.damages.map((damage, index) => (
+              <li key={index} className="text-base text-gray-700 pl-5 relative before:content-['•'] before:text-red-500 before:font-bold before:absolute before:left-0">
+                {damage}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Financial Impact */}
+        <div className="bg-white rounded-lg p-6 shadow-lg border-l-4 border-red-500">
+          <h3 className="text-2xl font-bold text-gray-800 mb-4 font-['Arial_Black']">
+            {data.financialImpact.title}
+          </h3>
+          <div className="space-y-3">
+            {data.financialImpact.items.map((item, index) => (
+              <div key={index} className="flex justify-between items-center text-base">
+                <span className="text-gray-700">{item.label}</span>
+                <span className="font-semibold text-gray-900 text-right">{item.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Municipal Negligence */}
+        <div className="bg-white rounded-lg p-6 shadow-lg border-l-4 border-red-500">
+          <h3 className="text-2xl font-bold text-gray-800 mb-4 font-['Arial_Black']">
+            {data.municipalNegligence.title}
+          </h3>
+          <ul className="space-y-2">
+            {data.municipalNegligence.items.map((item, index) => (
+              <li key={index} className="text-base text-gray-700 pl-5 relative before:content-['•'] before:text-red-500 before:font-bold before:absolute before:left-0">
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Evidence Documentation */}
+        <div className="bg-white rounded-lg p-6 shadow-lg border-l-4 border-red-500">
+          <h3 className="text-2xl font-bold text-gray-800 mb-4 font-['Arial_Black']">
+            {data.evidence.title}
+          </h3>
+          <div className="flex justify-around text-center">
+            {data.evidence.stats.map((stat, index) => (
+              <div key={index} className="text-gray-800">
+                <span className="block text-4xl font-black text-red-500 font-['Arial_Black']">{stat.number}</span>
+                <span className="text-sm text-gray-600 uppercase tracking-wider font-semibold">{stat.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Conclusion Section */}
+      <div className="mt-12 bg-gray-800/50 rounded-lg p-8 text-center border border-red-500/30">
+        <h3 className="text-2xl font-bold text-white mb-4 font-['Arial_Black']">
+          {data.conclusion.title}
+        </h3>
+        <p className="text-gray-300 leading-relaxed max-w-4xl mx-auto text-lg">
+          {data.conclusion.content}
+        </p>
+      </div>
+    </div>
+  );
+}

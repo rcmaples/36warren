@@ -1,22 +1,12 @@
 import {createClient} from 'next-sanity'
 
-import {apiVersion, dataset, projectId, studioUrl} from './api'
+import {apiVersion, dataset, projectId} from './api'
 
+// Client optimized for Live Content API
 export const client = createClient({
   projectId,
   dataset,
-  apiVersion,
+  apiVersion, // Should be 2025-01-01 (>= v2021-03-25)
   useCdn: true,
   perspective: 'published',
-  stega: {
-    studioUrl,
-    logger: console,
-    filter: (props) => {
-      if (props.sourcePath.at(-1) === 'title') {
-        return true
-      }
-
-      return props.filterDefault(props)
-    },
-  },
 })

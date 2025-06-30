@@ -1,0 +1,41 @@
+import { sanityFetch } from '../../lib/sanity/live'
+import { entriesQuery, settingsQuery, executiveSummaryQuery } from '../../lib/sanity/queries'
+import TimelineClient from './TimelineClient'
+
+// Server Component that fetches data with Live Content API
+export default async function TimelineServer() {
+  try {
+    // Fetch all data using the live-enabled sanityFetch
+    const [entriesResult, settingsResult, executiveSummaryResult] = await Promise.all([
+      sanityFetch({query: entriesQuery}),
+      sanityFetch({query: settingsQuery}), 
+      sanityFetch({query: executiveSummaryQuery})
+    ])
+
+    // Extract data from the results
+    const entries = entriesResult.data
+    const settings = settingsResult.data
+    const executiveSummary = executiveSummaryResult.data
+
+    // Pass the data to client component for interactivity
+    return (
+      <TimelineClient 
+        initialEntries={entries || []}
+        initialSettings={settings}
+        initialExecutiveSummary={executiveSummary}
+      />
+    )
+  } catch (error) {
+    console.error('Failed to fetch data with Live Content API:', error)
+    
+    // Fallback to empty data - TimelineClient will handle loading state
+    return (
+      <TimelineClient 
+        initialEntries={[]}
+        initialSettings={null}
+        initialExecutiveSummary={null}
+        error="Failed to load data with Live Content API"
+      />
+    )
+  }
+}
