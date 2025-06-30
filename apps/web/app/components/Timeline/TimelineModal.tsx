@@ -9,9 +9,26 @@ interface TimelineModalProps {
   selectedEntry: TimelineEntry | null
   isOpen: boolean
   onClose: () => void
+  onNavigateNext?: () => void
+  onNavigatePrevious?: () => void
 }
 
-export default function TimelineModal({selectedEntry, isOpen, onClose}: TimelineModalProps) {
+// Constants
+const ESCAPE_KEY = 'Escape'
+const NAVIGATION_KEYS = {
+  ARROW_UP: 'ArrowUp',
+  ARROW_DOWN: 'ArrowDown',
+  PAGE_UP: 'PageUp',
+  PAGE_DOWN: 'PageDown',
+} as const
+
+export default function TimelineModal({
+  selectedEntry,
+  isOpen,
+  onClose,
+  onNavigateNext,
+  onNavigatePrevious,
+}: TimelineModalProps) {
   const handleOverlayClick = useCallback(
     (e: React.MouseEvent) => {
       if (e.target === e.currentTarget) {
@@ -21,32 +38,40 @@ export default function TimelineModal({selectedEntry, isOpen, onClose}: Timeline
     [onClose],
   )
 
-  const handleEscapeKey = useCallback(
+  // Combined keyboard handler
+  const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === ESCAPE_KEY) {
         onClose()
+      } else if (e.key === NAVIGATION_KEYS.ARROW_UP || e.key === NAVIGATION_KEYS.PAGE_UP) {
+        e.preventDefault()
+        onNavigatePrevious?.()
+      } else if (e.key === NAVIGATION_KEYS.ARROW_DOWN || e.key === NAVIGATION_KEYS.PAGE_DOWN) {
+        e.preventDefault()
+        onNavigateNext?.()
       }
     },
-    [onClose],
+    [onClose, onNavigateNext, onNavigatePrevious],
   )
 
   useEffect(() => {
     if (isOpen) {
-      document.addEventListener('keydown', handleEscapeKey)
+      document.addEventListener('keydown', handleKeyDown)
       document.body.style.overflow = 'hidden'
     }
 
     return () => {
-      document.removeEventListener('keydown', handleEscapeKey)
+      document.removeEventListener('keydown', handleKeyDown)
       document.body.style.overflow = 'unset'
     }
-  }, [isOpen, handleEscapeKey])
+  }, [isOpen, handleKeyDown])
 
   if (!isOpen || !selectedEntry) return null
 
-  // Get images from either gallery (Sanity) or images (legacy)
+  // Extract data with fallbacks
   const entryImages = (selectedEntry as any).images || []
-  const hasImages = entryImages && entryImages.length > 0
+  const hasImages = entryImages.length > 0
+  const displayTitle = (selectedEntry.name || (selectedEntry as any).title)?.replace(/_/g, ' ')
 
   return (
     <div
@@ -66,9 +91,7 @@ export default function TimelineModal({selectedEntry, isOpen, onClose}: Timeline
         </button>
 
         <div className={styles['modal-date']}>{selectedEntry.date}</div>
-        <h2 className={styles['modal-title']}>
-          {(selectedEntry.name || (selectedEntry as any).title)?.replace(/_/g, ' ')}
-        </h2>
+        <h2 className={styles['modal-title']}>{displayTitle}</h2>
 
         {hasImages && <ImageCarousel images={entryImages} />}
 

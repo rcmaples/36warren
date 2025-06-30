@@ -13,9 +13,13 @@ export default function ExecutiveSummary({initialData}: ExecutiveSummaryProps) {
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
+    console.log('🔴 ExecutiveSummary: Processing initial data...', !!initialData)
+
     if (initialData) {
       setData(initialData)
     } else {
+      // No initial data - set to null for graceful fallback
+      console.warn('🔴 ExecutiveSummary: No initial data found')
       setData(null)
     }
   }, [initialData])

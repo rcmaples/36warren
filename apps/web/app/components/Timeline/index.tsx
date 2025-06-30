@@ -27,7 +27,7 @@ export default function Timeline({
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [currentView, setCurrentView] = useState<ViewType>('timeline')
   const [timelineData, setTimelineData] = useState<TimelineEntry[]>([])
-  const [settings] = useState<any>(initialSettings)
+  const [settings, setSettings] = useState<any>(initialSettings)
 
   // Helper function to extract plain text from Sanity rich text
   const getDescriptionText = (description: any): string => {
@@ -56,16 +56,32 @@ export default function Timeline({
   // Process initial data from server component
   useEffect(() => {
     try {
+      console.log('🔴 Timeline: Processing initial data...', {
+        entriesCount: initialEntries?.length || 0,
+        hasSettings: !!initialSettings,
+      })
+
       if (initialEntries && initialEntries.length > 0) {
         const processedEntries = initialEntries.map(processSanityEntry)
         setTimelineData(processedEntries)
+        console.log('🔴 Timeline: Processed entries:', processedEntries.length)
       } else {
+        // No fallback to mock data - just empty array
+        console.warn('🔴 Timeline: No initial entries found')
         setTimelineData([])
       }
     } catch (error) {
+      console.error('🔴 Timeline: Failed to process initial data:', error)
+      // No fallback to mock data on error - just empty array
       setTimelineData([])
     }
-  }, [initialEntries, initialSettings])
+  }, [initialEntries])
+
+  // Update settings when initialSettings prop changes (for live updates)
+  useEffect(() => {
+    console.log('🔴 Timeline: Updating settings...', !!initialSettings)
+    setSettings(initialSettings)
+  }, [initialSettings])
 
   useEffect(() => {
     setMounted(true)
@@ -80,6 +96,28 @@ export default function Timeline({
     setIsModalOpen(false)
     setSelectedEntry(null)
   }, [])
+
+  // Navigate to next timeline entry
+  const navigateToNext = useCallback(() => {
+    if (!selectedEntry || timelineData.length === 0) return
+    
+    const currentIndex = timelineData.findIndex(entry => entry._id === selectedEntry._id)
+    if (currentIndex !== -1 && currentIndex < timelineData.length - 1) {
+      const nextEntry = timelineData[currentIndex + 1]
+      setSelectedEntry(nextEntry)
+    }
+  }, [selectedEntry, timelineData])
+
+  // Navigate to previous timeline entry
+  const navigateToPrevious = useCallback(() => {
+    if (!selectedEntry || timelineData.length === 0) return
+    
+    const currentIndex = timelineData.findIndex(entry => entry._id === selectedEntry._id)
+    if (currentIndex > 0) {
+      const previousEntry = timelineData[currentIndex - 1]
+      setSelectedEntry(previousEntry)
+    }
+  }, [selectedEntry, timelineData])
 
   const switchView = useCallback((view: ViewType) => {
     setCurrentView(view)
@@ -190,7 +228,13 @@ export default function Timeline({
       )}
 
       {/* Modal */}
-      <TimelineModal selectedEntry={selectedEntry} isOpen={isModalOpen} onClose={closeModal} />
+      <TimelineModal
+        selectedEntry={selectedEntry}
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onNavigateNext={navigateToNext}
+        onNavigatePrevious={navigateToPrevious}
+      />
     </div>
   )
 }
