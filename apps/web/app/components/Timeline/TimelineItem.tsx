@@ -1,3 +1,4 @@
+import {Paperclip} from 'lucide-react'
 import React from 'react'
 
 import type {TimelineEntry} from '@/lib/types'
@@ -51,7 +52,7 @@ const TimelineItem = React.memo(function TimelineItem({
               right: '15px', // Position from right edge
             }}
           >
-            📄
+            <Paperclip className="w-4 h-4" />
           </div>
         )}
         {/* Only show impact badge if impact is defined */}
