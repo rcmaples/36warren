@@ -1,98 +1,101 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import { ExecutiveSummaryData } from '@/lib/types';
+import {useEffect, useState} from 'react'
+
+import type {ExecutiveSummaryData} from '@/lib/types'
 
 export default function ExecutiveSummary() {
-  const [data, setData] = useState<ExecutiveSummaryData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [data, setData] = useState<ExecutiveSummaryData | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     async function fetchExecutiveSummary() {
       try {
-        const response = await fetch('/api/executive-summary');
-        const result = await response.json();
-        
+        const response = await fetch('/api/executive-summary')
+        const result = await response.json()
+
         if (result.success && result.executiveSummary) {
-          setData(result.executiveSummary);
+          setData(result.executiveSummary)
         } else {
-          throw new Error('Failed to load executive summary');
+          throw new Error('Failed to load executive summary')
         }
       } catch (err) {
-        console.error('Error fetching executive summary:', err);
-        setError('Failed to load executive summary');
+        console.error('Error fetching executive summary:', err)
+        setError('Failed to load executive summary')
         // Fallback to default data (your current hardcoded content)
-        setData(getDefaultData());
+        setData(getDefaultData())
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
     }
 
-    fetchExecutiveSummary();
-  }, []);
+    fetchExecutiveSummary()
+  }, [])
 
   // Fallback data function
   function getDefaultData(): ExecutiveSummaryData {
     return {
-      title: "Executive Summary",
-      subtitle: "Municipal Storm Drain Infrastructure Failure",
+      title: 'Executive Summary',
+      subtitle: 'Municipal Storm Drain Infrastructure Failure',
       caseOverview: {
-        title: "Case Overview",
-        content: "A systematic failure of municipal storm drain infrastructure has resulted in repeated property flooding, significant financial damages, and ongoing safety hazards. Despite multiple reports and professional assessments, city officials have failed to address the root cause of the infrastructure failure."
+        title: 'Case Overview',
+        content:
+          'A systematic failure of municipal storm drain infrastructure has resulted in repeated property flooding, significant financial damages, and ongoing safety hazards. Despite multiple reports and professional assessments, city officials have failed to address the root cause of the infrastructure failure.',
       },
       timelineSection: {
-        title: "Timeline",
+        title: 'Timeline',
         events: [
-          { date: "March 2024:", description: "Initial complaint filed" },
-          { date: "April 2024:", description: "Inadequate city inspection" },
-          { date: "June 2024:", description: "Catastrophic drainage failure" },
-          { date: "August 2024:", description: "Insufficient repair attempts" },
-          { date: "September 2024:", description: "Continued flooding events" },
-          { date: "November 2024:", description: "Legal action initiated" }
-        ]
+          {date: 'March 2024:', description: 'Initial complaint filed'},
+          {date: 'April 2024:', description: 'Inadequate city inspection'},
+          {date: 'June 2024:', description: 'Catastrophic drainage failure'},
+          {date: 'August 2024:', description: 'Insufficient repair attempts'},
+          {date: 'September 2024:', description: 'Continued flooding events'},
+          {date: 'November 2024:', description: 'Legal action initiated'},
+        ],
       },
       documentedDamages: {
-        title: "Documented Damages",
+        title: 'Documented Damages',
         damages: [
-          "Basement flooding with contaminated water",
-          "Foundation structural damage",
-          "Electrical system compromise",
-          "Personal property destruction",
-          "Landscaping and yard damage"
-        ]
+          'Basement flooding with contaminated water',
+          'Foundation structural damage',
+          'Electrical system compromise',
+          'Personal property destruction',
+          'Landscaping and yard damage',
+        ],
       },
       financialImpact: {
-        title: "Financial Impact",
+        title: 'Financial Impact',
         items: [
-          { label: "Engineering Assessment:", value: "$45,000 Replacement" },
-          { label: "Property Damage:", value: "Ongoing" },
-          { label: "Legal Costs:", value: "Accumulating" }
-        ]
+          {label: 'Engineering Assessment:', value: '$45,000 Replacement'},
+          {label: 'Property Damage:', value: 'Ongoing'},
+          {label: 'Legal Costs:', value: 'Accumulating'},
+        ],
       },
       municipalNegligence: {
-        title: "Municipal Negligence",
+        title: 'Municipal Negligence',
         items: [
-          "Failed proper inspection",
-          "Ignored engineering recommendations",
-          "Implemented inadequate fixes",
-          "Refused to acknowledge failure",
-          "Delayed emergency response"
-        ]
+          'Failed proper inspection',
+          'Ignored engineering recommendations',
+          'Implemented inadequate fixes',
+          'Refused to acknowledge failure',
+          'Delayed emergency response',
+        ],
       },
       evidence: {
-        title: "Evidence",
+        title: 'Evidence',
         stats: [
-          { number: "15+", label: "Photos" },
-          { number: "6", label: "Events" },
-          { number: "8", label: "Months" }
-        ]
+          {number: '15+', label: 'Photos'},
+          {number: '6', label: 'Events'},
+          {number: '8', label: 'Months'},
+        ],
       },
       conclusion: {
-        title: "Conclusion",
-        content: "The evidence demonstrates a clear pattern of municipal negligence in maintaining critical infrastructure, resulting in preventable property damage. Immediate action is required to address the infrastructure failure and compensate for damages."
-      }
-    };
+        title: 'Conclusion',
+        content:
+          'The evidence demonstrates a clear pattern of municipal negligence in maintaining critical infrastructure, resulting in preventable property damage. Immediate action is required to address the infrastructure failure and compensate for damages.',
+      },
+    }
   }
 
   if (isLoading) {
@@ -103,7 +106,7 @@ export default function ExecutiveSummary() {
           <p className="text-white">Loading executive summary...</p>
         </div>
       </div>
-    );
+    )
   }
 
   if (!data) {
@@ -113,7 +116,7 @@ export default function ExecutiveSummary() {
           <p>Failed to load executive summary</p>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -123,7 +126,7 @@ export default function ExecutiveSummary() {
           <p>⚠️ Using fallback data: {error}</p>
         </div>
       )}
-      
+
       <div className="text-center mb-12">
         <h2 className="text-4xl font-black text-white mb-4 font-['Arial_Black'] tracking-wide">
           {data.title}
@@ -139,9 +142,7 @@ export default function ExecutiveSummary() {
           <h3 className="text-2xl font-bold text-gray-800 mb-4 font-['Arial_Black']">
             {data.caseOverview.title}
           </h3>
-          <p className="text-base text-gray-700 leading-relaxed">
-            {data.caseOverview.content}
-          </p>
+          <p className="text-base text-gray-700 leading-relaxed">{data.caseOverview.content}</p>
         </div>
 
         {/* Timeline */}
@@ -152,7 +153,8 @@ export default function ExecutiveSummary() {
           <ul className="space-y-3">
             {data.timelineSection.events.map((event, index) => (
               <li key={index} className="text-base text-gray-700">
-                <strong className="font-semibold text-gray-800">{event.date}</strong> {event.description}
+                <strong className="font-semibold text-gray-800">{event.date}</strong>{' '}
+                {event.description}
               </li>
             ))}
           </ul>
@@ -165,7 +167,10 @@ export default function ExecutiveSummary() {
           </h3>
           <ul className="space-y-2">
             {data.documentedDamages.damages.map((damage, index) => (
-              <li key={index} className="text-base text-gray-700 pl-5 relative before:content-['•'] before:text-red-500 before:font-bold before:absolute before:left-0">
+              <li
+                key={index}
+                className="text-base text-gray-700 pl-5 relative before:content-['•'] before:text-red-500 before:font-bold before:absolute before:left-0"
+              >
                 {damage}
               </li>
             ))}
@@ -194,7 +199,10 @@ export default function ExecutiveSummary() {
           </h3>
           <ul className="space-y-2">
             {data.municipalNegligence.items.map((item, index) => (
-              <li key={index} className="text-base text-gray-700 pl-5 relative before:content-['•'] before:text-red-500 before:font-bold before:absolute before:left-0">
+              <li
+                key={index}
+                className="text-base text-gray-700 pl-5 relative before:content-['•'] before:text-red-500 before:font-bold before:absolute before:left-0"
+              >
                 {item}
               </li>
             ))}
@@ -209,8 +217,12 @@ export default function ExecutiveSummary() {
           <div className="flex justify-around text-center">
             {data.evidence.stats.map((stat, index) => (
               <div key={index} className="text-gray-800">
-                <span className="block text-4xl font-black text-red-500 font-['Arial_Black']">{stat.number}</span>
-                <span className="text-sm text-gray-600 uppercase tracking-wider font-semibold">{stat.label}</span>
+                <span className="block text-4xl font-black text-red-500 font-['Arial_Black']">
+                  {stat.number}
+                </span>
+                <span className="text-sm text-gray-600 uppercase tracking-wider font-semibold">
+                  {stat.label}
+                </span>
               </div>
             ))}
           </div>
@@ -227,5 +239,5 @@ export default function ExecutiveSummary() {
         </p>
       </div>
     </div>
-  );
+  )
 }

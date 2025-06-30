@@ -1,29 +1,29 @@
-import { sanityFetch } from '../../lib/sanity/live'
-import { entriesQuery } from '../../lib/sanity/queries'
+import {sanityFetch} from '../../lib/sanity/live'
+import {entriesQuery} from '../../lib/sanity/queries'
 
 // Simple test page to verify Live Content API
 export default async function TestLivePage() {
   console.log('🔴 TestLivePage: Fetching with Live Content API...')
-  
+
   try {
-    const result = await sanityFetch({ query: entriesQuery })
+    const result = await sanityFetch({query: entriesQuery})
     console.log('🔴 Live fetch result:', result)
-    
+
     const entries = result.data || result
-    
+
     return (
       <div className="p-8">
         <h1 className="text-2xl font-bold mb-4">Live Content API Test</h1>
-        
+
         <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-          <strong>Live Content API Active!</strong> 
+          <strong>Live Content API Active!</strong>
           <p>This page uses Server Components with live-enabled sanityFetch.</p>
         </div>
-        
+
         <div className="mb-4">
           <h2 className="text-lg font-semibold">Entries Found: {entries?.length || 0}</h2>
         </div>
-        
+
         {entries && entries.length > 0 ? (
           <div className="space-y-4">
             {entries.slice(0, 3).map((entry: any, index: number) => (
@@ -37,7 +37,7 @@ export default async function TestLivePage() {
         ) : (
           <p className="text-gray-500">No entries found or still loading...</p>
         )}
-        
+
         <div className="mt-8 text-xs text-gray-500">
           <p>Try editing content in Sanity Studio - changes should appear here in real-time!</p>
         </div>
@@ -45,7 +45,7 @@ export default async function TestLivePage() {
     )
   } catch (error) {
     console.error('🔴 Error in TestLivePage:', error)
-    
+
     return (
       <div className="p-8">
         <h1 className="text-2xl font-bold mb-4">Live Content API Test - Error</h1>

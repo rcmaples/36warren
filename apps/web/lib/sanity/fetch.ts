@@ -19,7 +19,7 @@ export async function sanityFetch<const QueryString extends string>({
 }) {
   const perspective = _perspective || (await draftMode()).isEnabled ? 'previewDrafts' : 'published'
   const stega = _stega || perspective === 'previewDrafts' || process.env.VERCEL_ENV === 'preview'
-  
+
   if (perspective === 'previewDrafts') {
     return client.fetch(query, await params, {
       stega,
@@ -29,7 +29,7 @@ export async function sanityFetch<const QueryString extends string>({
       next: {revalidate: 0},
     })
   }
-  
+
   // For published content, fetch with appropriate caching for Live Content API
   // The SanityLive component will handle real-time updates
   return client.fetch(query, await params, {

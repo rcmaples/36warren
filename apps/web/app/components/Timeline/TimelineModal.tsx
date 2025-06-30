@@ -1,44 +1,52 @@
-import { useEffect, useCallback } from 'react';
-import { TimelineEntry } from '@/lib/types';
-import ImageCarousel from './ImageCarousel';
-import styles from './Timeline.module.css';
+import {useCallback, useEffect} from 'react'
+
+import type {TimelineEntry} from '@/lib/types'
+
+import ImageCarousel from './ImageCarousel'
+import styles from './Timeline.module.css'
 
 interface TimelineModalProps {
-  selectedEntry: TimelineEntry | null;
-  isOpen: boolean;
-  onClose: () => void;
+  selectedEntry: TimelineEntry | null
+  isOpen: boolean
+  onClose: () => void
 }
 
-export default function TimelineModal({ selectedEntry, isOpen, onClose }: TimelineModalProps) {
-  const handleOverlayClick = useCallback((e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  }, [onClose]);
+export default function TimelineModal({selectedEntry, isOpen, onClose}: TimelineModalProps) {
+  const handleOverlayClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (e.target === e.currentTarget) {
+        onClose()
+      }
+    },
+    [onClose],
+  )
 
-  const handleEscapeKey = useCallback((e: KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      onClose();
-    }
-  }, [onClose]);
+  const handleEscapeKey = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose()
+      }
+    },
+    [onClose],
+  )
 
   useEffect(() => {
     if (isOpen) {
-      document.addEventListener('keydown', handleEscapeKey);
-      document.body.style.overflow = 'hidden';
+      document.addEventListener('keydown', handleEscapeKey)
+      document.body.style.overflow = 'hidden'
     }
 
     return () => {
-      document.removeEventListener('keydown', handleEscapeKey);
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen, handleEscapeKey]);
+      document.removeEventListener('keydown', handleEscapeKey)
+      document.body.style.overflow = 'unset'
+    }
+  }, [isOpen, handleEscapeKey])
 
-  if (!isOpen || !selectedEntry) return null;
+  if (!isOpen || !selectedEntry) return null
 
   // Get images from either gallery (Sanity) or images (legacy)
-  const entryImages = (selectedEntry as any).images || [];
-  const hasImages = entryImages && entryImages.length > 0;
+  const entryImages = (selectedEntry as any).images || []
+  const hasImages = entryImages && entryImages.length > 0
 
   return (
     <div
@@ -62,14 +70,10 @@ export default function TimelineModal({ selectedEntry, isOpen, onClose }: Timeli
           {(selectedEntry.name || (selectedEntry as any).title)?.replace(/_/g, ' ')}
         </h2>
 
-        {hasImages && (
-          <ImageCarousel images={entryImages} />
-        )}
+        {hasImages && <ImageCarousel images={entryImages} />}
 
-        <p className={styles['modal-description']}>
-          {selectedEntry.fullDescription}
-        </p>
+        <p className={styles['modal-description']}>{selectedEntry.fullDescription}</p>
       </div>
     </div>
-  );
+  )
 }

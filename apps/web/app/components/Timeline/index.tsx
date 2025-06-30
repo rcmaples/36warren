@@ -1,106 +1,108 @@
-'use client';
+'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { TimelineEntry, ViewType } from '@/lib/types';
-import { processSanityEntry, mockTimelineData } from '@/lib/data';
-import TimelineItem from './TimelineItem';
-import TimelineModal from './TimelineModal';
-import ExecutiveSummary from './ExecutiveSummary';
-import styles from './Timeline.module.css';
+import {useCallback, useEffect, useMemo, useState} from 'react'
+
+import {mockTimelineData, processSanityEntry} from '@/lib/data'
+import type {TimelineEntry, ViewType} from '@/lib/types'
+
+import ExecutiveSummary from './ExecutiveSummary'
+import styles from './Timeline.module.css'
+import TimelineItem from './TimelineItem'
+import TimelineModal from './TimelineModal'
 
 export default function Timeline() {
-  const [mounted, setMounted] = useState(false);
-  const [selectedEntry, setSelectedEntry] = useState<TimelineEntry | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentView, setCurrentView] = useState<ViewType>('timeline');
-  const [timelineData, setTimelineData] = useState<TimelineEntry[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [settings, setSettings] = useState<any>(null);
+  const [mounted, setMounted] = useState(false)
+  const [selectedEntry, setSelectedEntry] = useState<TimelineEntry | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [currentView, setCurrentView] = useState<ViewType>('timeline')
+  const [timelineData, setTimelineData] = useState<TimelineEntry[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [settings, setSettings] = useState<any>(null)
   // Helper function to extract plain text from Sanity rich text
   const getDescriptionText = (description: any): string => {
-    if (!description) return '';
-    
+    if (!description) return ''
+
     // If it's already a string, return it
-    if (typeof description === 'string') return description;
-    
+    if (typeof description === 'string') return description
+
     // If it's rich text (array of blocks), extract text
     if (Array.isArray(description)) {
       return description
-        .filter(block => block._type === 'block')
-        .map(block => 
+        .filter((block) => block._type === 'block')
+        .map((block) =>
           block.children
             ?.filter((child: any) => child._type === 'span')
             .map((child: any) => child.text)
-            .join('')
+            .join(''),
         )
         .join(' ')
-        .trim();
+        .trim()
     }
-    
-    return '';
-  };
+
+    return ''
+  }
 
   // Fetch timeline data from API
   useEffect(() => {
     async function fetchData() {
       try {
-        setIsLoading(true);
-        setError(null);
-        
+        setIsLoading(true)
+        setError(null)
+
         // Fetch both timeline entries and settings in parallel
         const [entriesResponse, settingsResponse] = await Promise.all([
           fetch('/api/entries'),
-          fetch('/api/settings')
-        ]);
-        
-        const entriesData = await entriesResponse.json();
-        const settingsData = await settingsResponse.json();
-        
+          fetch('/api/settings'),
+        ])
+
+        const entriesData = await entriesResponse.json()
+        const settingsData = await settingsResponse.json()
+
         // Handle timeline data
         if (entriesData.success && entriesData.entries && entriesData.entries.length > 0) {
-          const processedEntries = entriesData.entries.map(processSanityEntry);
-          setTimelineData(processedEntries);
+          const processedEntries = entriesData.entries.map(processSanityEntry)
+          setTimelineData(processedEntries)
         } else {
           // Fallback to mock data if no Sanity data available
-          console.warn('No entries found in Sanity, using mock data');
-          setTimelineData(mockTimelineData as any);
+          console.warn('No entries found in Sanity, using mock data')
+          setTimelineData(mockTimelineData as any)
         }
-        
+
         // Handle settings data
         if (settingsData.success && settingsData.settings) {
-          setSettings(settingsData.settings);
+          setSettings(settingsData.settings)
         }
       } catch (error) {
-        console.error('Failed to fetch data:', error);
-        setError('Failed to load data');
+        console.error('Failed to fetch data:', error)
+        setError('Failed to load data')
         // Fallback to mock data on error
-        setTimelineData(mockTimelineData as any);
+        setTimelineData(mockTimelineData as any)
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
     }
 
-    fetchData();
-  }, []);
+    fetchData()
+  }, [])
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    setMounted(true)
+  }, [])
 
   const openModal = useCallback((entry: TimelineEntry) => {
-    setSelectedEntry(entry);
-    setIsModalOpen(true);
-  }, []);
+    setSelectedEntry(entry)
+    setIsModalOpen(true)
+  }, [])
 
   const closeModal = useCallback(() => {
-    setIsModalOpen(false);
-    setSelectedEntry(null);
-  }, []);
+    setIsModalOpen(false)
+    setSelectedEntry(null)
+  }, [])
 
   const switchView = useCallback((view: ViewType) => {
-    setCurrentView(view);
-  }, []);
+    setCurrentView(view)
+  }, [])
 
   const memoizedTimelineItems = useMemo(() => {
     return timelineData.map((item, index) => (
@@ -110,11 +112,11 @@ export default function Timeline() {
         index={index}
         onOpenModal={openModal}
       />
-    ));
-  }, [timelineData, openModal]);
+    ))
+  }, [timelineData, openModal])
 
   if (!mounted) {
-    return null;
+    return null
   }
 
   // Loading state
@@ -126,7 +128,7 @@ export default function Timeline() {
           <p>Loading timeline data...</p>
         </div>
       </div>
-    );
+    )
   }
 
   // Error state (still show interface with fallback data)
@@ -135,15 +137,15 @@ export default function Timeline() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center text-red-600">
           <p>Error loading timeline data: {error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => window.location.reload()}
             className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
           >
             Retry
           </button>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -159,7 +161,10 @@ export default function Timeline() {
       )}
 
       {/* Header with integrated tabs */}
-      <header className={`${styles.banner} fixed top-0 left-0 right-0 z-40 px-4 py-6`} style={{ marginTop: error ? '40px' : '0' }}>
+      <header
+        className={`${styles.banner} fixed top-0 left-0 right-0 z-40 px-4 py-6`}
+        style={{marginTop: error ? '40px' : '0'}}
+      >
         <div className="max-w-6xl mx-auto text-center">
           <h1 className={styles['banner-title']}>
             {settings?.title || 'STORM DRAIN INVESTIGATION'}
@@ -202,10 +207,12 @@ export default function Timeline() {
           role="tabpanel"
           aria-labelledby="timeline-tab"
           className="relative max-w-6xl mx-auto px-4 pb-20"
-          style={{ paddingTop: error ? '260px' : '200px' }}
+          style={{paddingTop: error ? '260px' : '200px'}}
         >
           {/* Central Timeline Line */}
-          <div className={`${styles['timeline-line']} absolute left-1/2 top-0 bottom-0 w-1 transform -translate-x-1/2 z-0`} />
+          <div
+            className={`${styles['timeline-line']} absolute left-1/2 top-0 bottom-0 w-1 transform -translate-x-1/2 z-0`}
+          />
 
           {/* Timeline Items */}
           <div className="relative z-10">
@@ -226,18 +233,14 @@ export default function Timeline() {
           role="tabpanel"
           aria-labelledby="summary-tab"
           className="relative"
-          style={{ paddingTop: error ? '260px' : '200px' }}
+          style={{paddingTop: error ? '260px' : '200px'}}
         >
           <ExecutiveSummary />
         </main>
       )}
 
       {/* Modal */}
-      <TimelineModal
-        selectedEntry={selectedEntry}
-        isOpen={isModalOpen}
-        onClose={closeModal}
-      />
+      <TimelineModal selectedEntry={selectedEntry} isOpen={isModalOpen} onClose={closeModal} />
     </div>
-  );
+  )
 }

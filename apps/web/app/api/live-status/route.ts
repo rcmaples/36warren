@@ -1,1 +1,60 @@
-import { NextRequest, NextResponse } from 'next/server'\nimport { getLiveContentStatus } from '@/lib/sanity/live-utils'\n\nexport async function GET(request: NextRequest) {\n  try {\n    const status = getLiveContentStatus()\n    \n    return NextResponse.json({\n      status,\n      timestamp: new Date().toISOString(),\n      environment: {\n        nodeEnv: process.env.NODE_ENV,\n        vercelEnv: process.env.VERCEL_ENV,\n      },\n      recommendations: getRecommendations(status)\n    })\n  } catch (error) {\n    console.error('Error checking Live Content status:', error)\n    \n    return NextResponse.json(\n      { \n        error: 'Failed to check Live Content status',\n        timestamp: new Date().toISOString()\n      },\n      { status: 500 }\n    )\n  }\n}\n\nfunction getRecommendations(status: any) {\n  const recommendations = []\n  \n  if (!status.hasValidApiVersion) {\n    recommendations.push('Update NEXT_PUBLIC_SANITY_API_VERSION to v2021-03-25 or later')\n  }\n  \n  if (!status.hasProjectId) {\n    recommendations.push('Set NEXT_PUBLIC_SANITY_PROJECT_ID environment variable')\n  }\n  \n  if (!status.hasDataset) {\n    recommendations.push('Set NEXT_PUBLIC_SANITY_DATASET environment variable')\n  }\n  \n  if (!status.hasToken) {\n    recommendations.push('Set SANITY_API_READ_TOKEN for draft mode and visual editing (optional for public content)')\n  }\n  \n  if (status.isFullyConfigured) {\n    recommendations.push('✅ Live Content API is properly configured!')\n    recommendations.push('Visit /live to see the full Live Content API implementation')\n  }\n  \n  return recommendations\n}\n
+import type {NextRequest} from 'next/server'
+import {NextResponse} from 'next/server'
+
+import {getLiveContentStatus} from '@/lib/sanity/live-utils'
+
+export async function GET(request: NextRequest) {
+  try {
+    const status = getLiveContentStatus()
+
+    return NextResponse.json({
+      status,
+      timestamp: new Date().toISOString(),
+      environment: {
+        nodeEnv: process.env.NODE_ENV,
+        vercelEnv: process.env.VERCEL_ENV,
+      },
+      recommendations: getRecommendations(status),
+    })
+  } catch (error) {
+    console.error('Error checking Live Content status:', error)
+
+    return NextResponse.json(
+      {
+        error: 'Failed to check Live Content status',
+        timestamp: new Date().toISOString(),
+      },
+      {status: 500},
+    )
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getRecommendations(status: any) {
+  const recommendations = []
+
+  if (!status.hasValidApiVersion) {
+    recommendations.push('Update NEXT_PUBLIC_SANITY_API_VERSION to v2021-03-25 or later')
+  }
+
+  if (!status.hasProjectId) {
+    recommendations.push('Set NEXT_PUBLIC_SANITY_PROJECT_ID environment variable')
+  }
+
+  if (!status.hasDataset) {
+    recommendations.push('Set NEXT_PUBLIC_SANITY_DATASET environment variable')
+  }
+
+  if (!status.hasToken) {
+    recommendations.push(
+      'Set SANITY_API_READ_TOKEN for draft mode and visual editing (optional for public content)',
+    )
+  }
+
+  if (status.isFullyConfigured) {
+    recommendations.push('✅ Live Content API is properly configured!')
+    recommendations.push('Visit /live to see the full Live Content API implementation')
+  }
+
+  return recommendations
+}

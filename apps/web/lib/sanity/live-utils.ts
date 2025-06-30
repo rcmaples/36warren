@@ -1,4 +1,4 @@
-import { revalidateTag } from 'next/cache'
+import {revalidateTag} from 'next/cache'
 
 /**
  * Utility functions for working with Sanity Live Content API
@@ -23,7 +23,7 @@ export function revalidateSanityContent() {
 export function checkLiveContentConfig() {
   const apiVersion = process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2025-01-01'
   const hasValidApiVersion = apiVersion >= 'v2021-03-25' || apiVersion >= '2021-03-25'
-  
+
   return {
     hasValidApiVersion,
     apiVersion,
@@ -38,7 +38,7 @@ export function checkLiveContentConfig() {
  */
 export function getLiveContentStatus() {
   const config = checkLiveContentConfig()
-  
+
   return {
     ...config,
     isFullyConfigured: config.hasValidApiVersion && config.hasProjectId && config.hasDataset,

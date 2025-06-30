@@ -21,7 +21,7 @@ export const executiveSummary = defineType({
       initialValue: 'Municipal Storm Drain Infrastructure Failure',
       validation: (rule) => rule.required(),
     }),
-    
+
     // Case Overview Section
     defineField({
       name: 'caseOverview',
@@ -42,7 +42,7 @@ export const executiveSummary = defineType({
         }),
       ],
     }),
-    
+
     // Timeline Section
     defineField({
       name: 'timelineSection',
@@ -85,7 +85,7 @@ export const executiveSummary = defineType({
         }),
       ],
     }),
-    
+
     // Documented Damages Section
     defineField({
       name: 'documentedDamages',
@@ -110,7 +110,7 @@ export const executiveSummary = defineType({
         }),
       ],
     }),
-    
+
     // Financial Impact Section
     defineField({
       name: 'financialImpact',
@@ -153,7 +153,7 @@ export const executiveSummary = defineType({
         }),
       ],
     }),
-    
+
     // Municipal Negligence Section
     defineField({
       name: 'municipalNegligence',
@@ -178,7 +178,7 @@ export const executiveSummary = defineType({
         }),
       ],
     }),
-    
+
     // Evidence Section
     defineField({
       name: 'evidence',
@@ -221,7 +221,7 @@ export const executiveSummary = defineType({
         }),
       ],
     }),
-    
+
     // Conclusion Section
     defineField({
       name: 'conclusion',

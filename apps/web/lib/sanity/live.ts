@@ -6,7 +6,7 @@ import {client} from './client'
 console.log('🔴 Configuring Live Content API with:', {
   projectId: client.config().projectId,
   dataset: client.config().dataset,
-  apiVersion: client.config().apiVersion
+  apiVersion: client.config().apiVersion,
 })
 
 export const {sanityFetch, SanityLive} = defineLive({

@@ -14,15 +14,15 @@ export const mockTimelineData = [
         name: 'John Smith',
         jobTitle: 'Public Works Supervisor',
         department: 'City Public Works',
-        email: 'j.smith@city.gov'
+        email: 'j.smith@city.gov',
       },
       {
-        _id: 'person2', 
+        _id: 'person2',
         name: 'Sarah Johnson',
         jobTitle: 'Inspector',
         department: 'Infrastructure',
-        email: 's.johnson@city.gov'
-      }
+        email: 's.johnson@city.gov',
+      },
     ],
     images: [
       {
@@ -62,43 +62,43 @@ export const mockTimelineData = [
         name: 'John Smith',
         jobTitle: 'Public Works Supervisor',
         department: 'City Public Works',
-        email: 'j.smith@city.gov'
+        email: 'j.smith@city.gov',
       },
       {
         _id: 'person3',
         name: 'Mike Wilson',
         jobTitle: 'Emergency Response Coordinator',
         department: 'Emergency Services',
-        email: 'm.wilson@city.gov'
+        email: 'm.wilson@city.gov',
       },
       {
         _id: 'person4',
         name: 'Lisa Chen',
-        jobTitle: 'Structural Engineer', 
+        jobTitle: 'Structural Engineer',
         department: 'Engineering',
-        email: 'l.chen@city.gov'
+        email: 'l.chen@city.gov',
       },
       {
         _id: 'person5',
         name: 'David Brown',
         jobTitle: 'Property Inspector',
         department: 'Building & Safety',
-        email: 'd.brown@city.gov'
+        email: 'd.brown@city.gov',
       },
       {
         _id: 'person6',
         name: 'Amy Rodriguez',
         jobTitle: 'Claims Adjuster',
         department: 'Insurance',
-        email: 'a.rodriguez@insurance.com'
+        email: 'a.rodriguez@insurance.com',
       },
       {
         _id: 'person7',
         name: 'Tom Anderson',
         jobTitle: 'Contractor',
         department: 'Emergency Repairs',
-        email: 't.anderson@repairs.com'
-      }
+        email: 't.anderson@repairs.com',
+      },
     ],
     images: [
       {
@@ -135,8 +135,7 @@ export const mockTimelineData = [
       },
       {
         url: '/placeholder.svg?height=400&width=600&text=Engineering+report',
-        caption:
-          'Professional engineering assessment of infrastructure failure',
+        caption: 'Professional engineering assessment of infrastructure failure',
       },
       {
         url: '/placeholder.svg?height=400&width=600&text=Damage+documentation',
@@ -157,61 +156,60 @@ export const mockTimelineData = [
       "Following months of inadequate city response and continued property damage, formal legal notice has been served demanding immediate action and compensation for damages. Independent engineering report conclusively demonstrates that the storm drain infrastructure has completely failed and poses ongoing risk to property and public safety. Report recommends immediate replacement of entire drain line section at estimated cost of $45,000. City's previous 'repairs' are documented as substandard and potentially dangerous. Case now under legal review with potential for litigation if city continues to refuse proper remediation.",
     severity: 'critical',
   },
-];
+]
 
 // Utility functions for processing Sanity data
-import { TimelineEntry } from './types';
+import type {TimelineEntry} from './types'
 
 // Format date from ISO string to YYYY-MM-DD
 export function formatEntryDate(dateString: string): string {
   try {
-    const date = new Date(dateString);
-    return date.toISOString().split('T')[0]; // Returns YYYY-MM-DD
+    const date = new Date(dateString)
+    return date.toISOString().split('T')[0] // Returns YYYY-MM-DD
   } catch (error) {
-    console.warn('Invalid date format:', dateString);
-    return dateString; // Return original if parsing fails
+    console.warn('Invalid date format:', dateString)
+    return dateString // Return original if parsing fails
   }
 }
 
 // Simple image conversion without importing image utilities (to avoid build errors)
 function convertSanityImageToTimelineImage(sanityImage: any): any {
   if (!sanityImage?.asset?._ref) {
-    return null;
+    return null
   }
 
   try {
     // Basic Sanity image URL construction
-    const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'mrsdi6mo';
-    const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || '36warren';
-    const assetId = sanityImage.asset._ref;
-    
+    const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || 'mrsdi6mo'
+    const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || '36warren'
+    const assetId = sanityImage.asset._ref
+
     // Extract the asset ID parts
-    const [, id, dimensions, format] = assetId.match(/image-([a-f\d]+)-(\d+x\d+)-(\w+)/) || [];
-    
+    const [, id, dimensions, format] = assetId.match(/image-([a-f\d]+)-(\d+x\d+)-(\w+)/) || []
+
     if (id && dimensions && format) {
-      const baseUrl = `https://cdn.sanity.io/images/${projectId}/${dataset}/${id}-${dimensions}.${format}`;
-      
+      const baseUrl = `https://cdn.sanity.io/images/${projectId}/${dataset}/${id}-${dimensions}.${format}`
+
       return {
         url: `${baseUrl}?w=800&h=600&fit=max&auto=format`,
-        caption: sanityImage.alt || ''
-      };
+        caption: sanityImage.alt || '',
+      }
     }
-    
-    return null;
+
+    return null
   } catch (error) {
-    console.warn('Failed to process Sanity image:', error);
-    return null;
+    console.warn('Failed to process Sanity image:', error)
+    return null
   }
 }
 
 // Convert Sanity entry to TimelineEntry format for compatibility
 export function processSanityEntry(sanityEntry: any): TimelineEntry {
-  const processedImages = sanityEntry.gallery
-    ?.map(convertSanityImageToTimelineImage)
-    .filter(Boolean) || [];
+  const processedImages =
+    sanityEntry.gallery?.map(convertSanityImageToTimelineImage).filter(Boolean) || []
 
   // Process people data
-  const processedPeople = sanityEntry.people || [];
+  const processedPeople = sanityEntry.people || []
 
   return {
     _id: sanityEntry._id,
@@ -227,6 +225,6 @@ export function processSanityEntry(sanityEntry: any): TimelineEntry {
     // Map fields for backward compatibility
     title: sanityEntry.name,
     description: sanityEntry.shortDescription,
-    severity: sanityEntry.impact === 'low' ? 'medium' : sanityEntry.impact || 'medium'
-  } as any;
+    severity: sanityEntry.impact === 'low' ? 'medium' : sanityEntry.impact || 'medium',
+  } as any
 }

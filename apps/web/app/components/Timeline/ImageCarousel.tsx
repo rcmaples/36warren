@@ -1,27 +1,29 @@
-import { useState, useCallback } from 'react';
-import { TimelineImage } from '@/lib/types';
-import styles from './Timeline.module.css';
+import {useCallback, useState} from 'react'
+
+import type {TimelineImage} from '@/lib/types'
+
+import styles from './Timeline.module.css'
 
 interface ImageCarouselProps {
-  images: TimelineImage[];
+  images: TimelineImage[]
 }
 
-export default function ImageCarousel({ images }: ImageCarouselProps) {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+export default function ImageCarousel({images}: ImageCarouselProps) {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
   const nextImage = useCallback(() => {
-    setCurrentImageIndex((prev) => (prev + 1) % images.length);
-  }, [images.length]);
+    setCurrentImageIndex((prev) => (prev + 1) % images.length)
+  }, [images.length])
 
   const prevImage = useCallback(() => {
-    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
-  }, [images.length]);
+    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length)
+  }, [images.length])
 
   const handleImageClick = useCallback(() => {
-    window.open(images[currentImageIndex].url, '_blank');
-  }, [images, currentImageIndex]);
+    window.open(images[currentImageIndex].url, '_blank')
+  }, [images, currentImageIndex])
 
-  if (!images || images.length === 0) return null;
+  if (!images || images.length === 0) return null
 
   return (
     <div className={styles['carousel-container']}>
@@ -65,9 +67,7 @@ export default function ImageCarousel({ images }: ImageCarouselProps) {
         </>
       )}
 
-      <div className={styles['image-caption']}>
-        {images[currentImageIndex].caption}
-      </div>
+      <div className={styles['image-caption']}>{images[currentImageIndex].caption}</div>
     </div>
-  );
+  )
 }

@@ -32,6 +32,7 @@ export const baseConfig = [
             'SANITY_STUDIO_HOST',
             'SANITY_STUDIO_PROJECT_ID',
             'VERCEL_ENV',
+            'NODE_ENV',
           ],
         },
       ],
