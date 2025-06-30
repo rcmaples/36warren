@@ -56,22 +56,15 @@ export default function Timeline({
   // Process initial data from server component
   useEffect(() => {
     try {
-      console.log('🔴 Timeline: Processing initial data...', {
-        entriesCount: initialEntries?.length || 0,
-        hasSettings: !!initialSettings,
-      })
-
       if (initialEntries && initialEntries.length > 0) {
         const processedEntries = initialEntries.map(processSanityEntry)
         setTimelineData(processedEntries)
-        console.log('🔴 Timeline: Processed entries:', processedEntries.length)
       } else {
         // No fallback to mock data - just empty array
-        console.warn('🔴 Timeline: No initial entries found')
         setTimelineData([])
       }
     } catch (error) {
-      console.error('🔴 Timeline: Failed to process initial data:', error)
+      console.error('🔴 Timeline: Error processing initial data:', error)
       // No fallback to mock data on error - just empty array
       setTimelineData([])
     }
@@ -79,7 +72,6 @@ export default function Timeline({
 
   // Update settings when initialSettings prop changes (for live updates)
   useEffect(() => {
-    console.log('🔴 Timeline: Updating settings...', !!initialSettings)
     setSettings(initialSettings)
   }, [initialSettings])
 
@@ -100,8 +92,8 @@ export default function Timeline({
   // Navigate to next timeline entry
   const navigateToNext = useCallback(() => {
     if (!selectedEntry || timelineData.length === 0) return
-    
-    const currentIndex = timelineData.findIndex(entry => entry._id === selectedEntry._id)
+
+    const currentIndex = timelineData.findIndex((entry) => entry._id === selectedEntry._id)
     if (currentIndex !== -1 && currentIndex < timelineData.length - 1) {
       const nextEntry = timelineData[currentIndex + 1]
       setSelectedEntry(nextEntry)
@@ -111,8 +103,8 @@ export default function Timeline({
   // Navigate to previous timeline entry
   const navigateToPrevious = useCallback(() => {
     if (!selectedEntry || timelineData.length === 0) return
-    
-    const currentIndex = timelineData.findIndex(entry => entry._id === selectedEntry._id)
+
+    const currentIndex = timelineData.findIndex((entry) => entry._id === selectedEntry._id)
     if (currentIndex > 0) {
       const previousEntry = timelineData[currentIndex - 1]
       setSelectedEntry(previousEntry)
@@ -221,7 +213,7 @@ export default function Timeline({
           role="tabpanel"
           aria-labelledby="summary-tab"
           className="relative"
-          style={{paddingTop: '200px'}}
+          style={{paddingTop: '150px'}}
         >
           <ExecutiveSummary initialData={initialExecutiveSummary} />
         </main>
