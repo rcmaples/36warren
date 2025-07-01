@@ -4,11 +4,11 @@
 import {at, defineMigration, setIfMissing, unset} from 'sanity/migrate'
 
 export default defineMigration({
-  title: 'Duplicate fullDescription text into a Portable Text array',
+  title: 'Remove fullDescription field',
   documentTypes: ['entry'],
   migrate: {
     document(doc, ctx) {
-      return [at('fullDescription', setIfMissing(doc.fullDescriptionPT))]
+      return [at('fullDescription', unset())]
     },
   },
 })

@@ -36,8 +36,7 @@ export type Entry = {
   name: string
   date: string
   shortDescription: string
-  fullDescription: string
-  fullDescriptionPT?: Array<{
+  fullDescription: Array<{
     children?: Array<{
       marks?: Array<string>
       text?: string

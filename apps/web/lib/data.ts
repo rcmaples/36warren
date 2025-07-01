@@ -61,7 +61,7 @@ export function processSanityEntry(sanityEntry: Record<string, unknown>): Timeli
     name: sanityEntry.name as string,
     date: formatEntryDate(sanityEntry.date as string),
     shortDescription: sanityEntry.shortDescription as string,
-    fullDescription: sanityEntry.fullDescription as string,
+    fullDescription: sanityEntry.fullDescription as unknown[], // Map portable text field
     impact: sanityEntry.impact as string,
     gallery: sanityEntry.gallery as unknown[],
     people: processedPeople as unknown[],

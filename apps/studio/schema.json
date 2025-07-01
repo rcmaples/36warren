@@ -134,13 +134,6 @@
       "fullDescription": {
         "type": "objectAttribute",
         "value": {
-          "type": "string"
-        },
-        "optional": false
-      },
-      "fullDescriptionPT": {
-        "type": "objectAttribute",
-        "value": {
           "type": "array",
           "of": {
             "type": "object",

@@ -38,15 +38,6 @@ export const entryType = defineType({
     defineField({
       name: 'fullDescription',
       title: 'Full Description',
-      type: 'text',
-      description: 'Detailed description of the entry',
-      validation: (Rule) =>
-        Rule.required().min(10).error('Full description must be at least 10 characters'),
-      rows: 5,
-    }),
-    defineField({
-      name: 'fullDescriptionPT',
-      title: 'Full Description Portable Text',
       type: 'array',
       of: [{type: 'block'}],
     }),
