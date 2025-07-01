@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import React, {useCallback, useEffect, useState} from 'react'
+import {ChevronLeftIcon, ChevronRightIcon} from '@sanity/icons'
 
 import type {TimelineImage} from '@/lib/types'
 
@@ -60,7 +61,7 @@ export default function ImageCarousel({images}: ImageCarouselProps) {
   }, [handleKeyPress])
 
   const handleImageClick = useCallback(() => {
-    window.open(images[currentImageIndex].url, '_blank')
+    window.open(images[currentImageIndex].originalUrl, '_blank')
   }, [images, currentImageIndex])
 
   // Handle image load to detect orientation
@@ -88,7 +89,7 @@ export default function ImageCarousel({images}: ImageCarouselProps) {
               : styles['image-loading']
         }`}
         onClick={handleImageClick}
-        title="Click to view full size evidence"
+        title="Click to view full size image"
         onLoad={handleImageLoad}
       />
 
@@ -97,16 +98,16 @@ export default function ImageCarousel({images}: ImageCarouselProps) {
           <button
             className={`${styles['carousel-nav']} ${styles.prev}`}
             onClick={prevImage}
-            aria-label="Previous evidence"
+            aria-label="Previous image"
           >
-            ‹
+            <ChevronLeftIcon style={{fontSize: '24px'}} />
           </button>
           <button
             className={`${styles['carousel-nav']} ${styles.next}`}
             onClick={nextImage}
-            aria-label="Next evidence"
+            aria-label="Next image"
           >
-            ›
+            <ChevronRightIcon style={{fontSize: '24px'}} />
           </button>
 
           <div className={styles['carousel-indicators']}>
@@ -117,7 +118,7 @@ export default function ImageCarousel({images}: ImageCarouselProps) {
                   idx === currentImageIndex ? styles.active : ''
                 }`}
                 onClick={() => navigateToImage(idx)}
-                aria-label={`View evidence ${idx + 1}`}
+                aria-label={`View images ${idx + 1}`}
               />
             ))}
           </div>

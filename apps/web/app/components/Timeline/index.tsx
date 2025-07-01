@@ -1,11 +1,11 @@
 'use client'
 
+import {useRouter, useSearchParams} from 'next/navigation'
 import {useCallback, useEffect, useMemo, useState} from 'react'
 
 import {processSanityEntry} from '@/lib/data'
-import type {ExecutiveSummaryData, TimelineEntry, ViewType} from '@/lib/types'
+import type {TimelineEntry} from '@/lib/types'
 
-import ExecutiveSummary from './ExecutiveSummary'
 import styles from './Timeline.module.css'
 import TimelineItem from './TimelineItem'
 import TimelineModal from './TimelineModal'
@@ -16,45 +16,14 @@ interface TimelineProps {
   initialExecutiveSummary: unknown
 }
 
-interface CaseOverview {
-  title: string
-  content: string
-}
-
-// Type guard for ExecutiveSummaryData
-function isExecutiveSummaryData(data: unknown): data is ExecutiveSummaryData {
-  if (!data || typeof data !== 'object') return false
-  const d = data as Record<string, unknown>
-  const caseOverview = d.caseOverview as CaseOverview | undefined
-
-  return (
-    typeof d.title === 'string' &&
-    typeof d.subtitle === 'string' &&
-    typeof d.caseOverview === 'object' &&
-    d.caseOverview !== null &&
-    typeof caseOverview?.title === 'string' &&
-    typeof caseOverview?.content === 'string' &&
-    // Add minimal validation for required structure
-    typeof d.timelineSection === 'object' &&
-    typeof d.documentedDamages === 'object' &&
-    typeof d.financialImpact === 'object' &&
-    typeof d.municipalNegligence === 'object' &&
-    typeof d.evidence === 'object' &&
-    typeof d.conclusion === 'object'
-  )
-}
-
-export default function Timeline({
-  initialEntries,
-  initialSettings,
-  initialExecutiveSummary,
-}: TimelineProps) {
+export default function Timeline({initialEntries, initialSettings}: TimelineProps) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [mounted, setMounted] = useState(false)
-  const [selectedEntry, setSelectedEntry] = useState<TimelineEntry | null>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [currentView, setCurrentView] = useState<ViewType>('timeline')
   const [timelineData, setTimelineData] = useState<TimelineEntry[]>([])
   const [settings, setSettings] = useState<unknown>(initialSettings)
+  const [selectedEntry, setSelectedEntry] = useState<TimelineEntry | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   // Helper function to extract plain text from Sanity rich text
   const getDescriptionText = (description: unknown): string => {
@@ -91,15 +60,31 @@ export default function Timeline({
           .map(processSanityEntry)
         setTimelineData(processedEntries)
       } else {
-        // No fallback to mock data - just empty array
         setTimelineData([])
       }
     } catch (error) {
       console.error('🔴 Timeline: Error processing initial data:', error)
-      // No fallback to mock data on error - just empty array
       setTimelineData([])
     }
   }, [initialEntries])
+
+  // Handle URL-based modal state
+  useEffect(() => {
+    const eventId = searchParams.get('event')
+    if (eventId && timelineData.length > 0) {
+      const entry = timelineData.find((item) => item._id === eventId)
+      if (entry) {
+        setSelectedEntry(entry)
+        setIsModalOpen(true)
+      } else {
+        // Event ID not found, remove from URL
+        router.replace('/')
+      }
+    } else {
+      setSelectedEntry(null)
+      setIsModalOpen(false)
+    }
+  }, [searchParams, timelineData, router])
 
   // Update settings when initialSettings prop changes (for live updates)
   useEffect(() => {
@@ -110,15 +95,20 @@ export default function Timeline({
     setMounted(true)
   }, [])
 
-  const openModal = useCallback((entry: TimelineEntry) => {
-    setSelectedEntry(entry)
-    setIsModalOpen(true)
-  }, [])
+  const openModal = useCallback(
+    (entry: TimelineEntry) => {
+      const url = new URL(window.location.href)
+      url.searchParams.set('event', entry._id)
+      router.push(url.pathname + url.search)
+    },
+    [router],
+  )
 
   const closeModal = useCallback(() => {
     setIsModalOpen(false)
     setSelectedEntry(null)
-  }, [])
+    router.push('/')
+  }, [router])
 
   // Navigate to next timeline entry
   const navigateToNext = useCallback(() => {
@@ -127,9 +117,11 @@ export default function Timeline({
     const currentIndex = timelineData.findIndex((entry) => entry._id === selectedEntry._id)
     if (currentIndex !== -1 && currentIndex < timelineData.length - 1) {
       const nextEntry = timelineData[currentIndex + 1]
-      setSelectedEntry(nextEntry)
+      const url = new URL(window.location.href)
+      url.searchParams.set('event', nextEntry._id)
+      router.push(url.pathname + url.search)
     }
-  }, [selectedEntry, timelineData])
+  }, [selectedEntry, timelineData, router])
 
   // Navigate to previous timeline entry
   const navigateToPrevious = useCallback(() => {
@@ -138,13 +130,15 @@ export default function Timeline({
     const currentIndex = timelineData.findIndex((entry) => entry._id === selectedEntry._id)
     if (currentIndex > 0) {
       const previousEntry = timelineData[currentIndex - 1]
-      setSelectedEntry(previousEntry)
+      const url = new URL(window.location.href)
+      url.searchParams.set('event', previousEntry._id)
+      router.push(url.pathname + url.search)
     }
-  }, [selectedEntry, timelineData])
+  }, [selectedEntry, timelineData, router])
 
-  const switchView = useCallback((view: ViewType) => {
-    setCurrentView(view)
-  }, [])
+  const handleSummaryNavigation = useCallback(() => {
+    router.push('/summary')
+  }, [router])
 
   const memoizedTimelineItems = useMemo(() => {
     return timelineData.map((item, index) => (
@@ -179,23 +173,18 @@ export default function Timeline({
 
           <nav className={styles['folder-tabs']} role="tablist" aria-label="View selection">
             <button
-              className={`${styles['folder-tab']} ${
-                currentView === 'timeline' ? styles.active : ''
-              }`}
-              onClick={() => switchView('timeline')}
+              className={`${styles['folder-tab']} ${styles.active}`}
               role="tab"
-              aria-selected={currentView === 'timeline'}
+              aria-selected={true}
               aria-controls="timeline-content"
             >
               Timeline
             </button>
             <button
-              className={`${styles['folder-tab']} ${
-                currentView === 'summary' ? styles.active : ''
-              }`}
-              onClick={() => switchView('summary')}
+              className={`${styles['folder-tab']}`}
+              onClick={handleSummaryNavigation}
               role="tab"
-              aria-selected={currentView === 'summary'}
+              aria-selected={false}
               aria-controls="summary-content"
             >
               Executive Summary
@@ -204,56 +193,38 @@ export default function Timeline({
         </div>
       </header>
 
-      {/* Main Content Area */}
-      {currentView === 'timeline' && (
-        <main
-          id="timeline-content"
-          role="tabpanel"
-          aria-labelledby="timeline-tab"
-          className="relative max-w-6xl mx-auto px-4 pb-20"
-          style={{paddingTop: '200px'}}
-        >
-          {/* Central Timeline Line */}
-          <div
-            className={`${styles['timeline-line']} absolute left-1/2 top-0 bottom-0 w-1 transform -translate-x-1/2 z-0`}
-          />
+      {/* Main Content Area - Timeline */}
+      <main
+        id="timeline-content"
+        role="tabpanel"
+        aria-labelledby="timeline-tab"
+        className="relative max-w-6xl mx-auto px-4 pb-20"
+        style={{paddingTop: '200px'}}
+      >
+        {/* Central Timeline Line */}
+        <div
+          className={`${styles['timeline-line']} absolute left-1/2 top-0 bottom-0 w-1 transform -translate-x-1/2 z-0`}
+        />
 
-          {/* Timeline Items */}
-          <div className="relative z-10">
-            {timelineData.length > 0 ? (
-              memoizedTimelineItems
-            ) : (
-              <div className="text-center py-20">
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 mx-auto max-w-md">
-                  <h3 className="text-xl font-semibold text-white mb-4">
-                    No Timeline Data Available
-                  </h3>
-                  <p className="text-gray-300">
-                    No timeline entries have been found. Please check your Sanity Studio content or
-                    contact your administrator.
-                  </p>
-                </div>
+        {/* Timeline Items */}
+        <div className="relative z-10">
+          {timelineData.length > 0 ? (
+            memoizedTimelineItems
+          ) : (
+            <div className="text-center py-20">
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-8 mx-auto max-w-md">
+                <h3 className="text-xl font-semibold text-white mb-4">
+                  No Timeline Data Available
+                </h3>
+                <p className="text-gray-300">
+                  No timeline entries have been found. Please check your Sanity Studio content or
+                  contact your administrator.
+                </p>
               </div>
-            )}
-          </div>
-        </main>
-      )}
-
-      {currentView === 'summary' && (
-        <main
-          id="summary-content"
-          role="tabpanel"
-          aria-labelledby="summary-tab"
-          className="relative max-w-7xl mx-auto px-4"
-          style={{paddingTop: '150px'}}
-        >
-          <ExecutiveSummary
-            initialData={
-              isExecutiveSummaryData(initialExecutiveSummary) ? initialExecutiveSummary : null
-            }
-          />
-        </main>
-      )}
+            </div>
+          )}
+        </div>
+      </main>
 
       {/* Modal */}
       <TimelineModal

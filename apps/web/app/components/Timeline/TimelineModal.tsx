@@ -1,4 +1,5 @@
 import {useCallback, useEffect} from 'react'
+import {CloseIcon} from '@sanity/icons'
 
 import type {TimelineEntry, TimelineImage} from '@/lib/types'
 
@@ -11,7 +12,9 @@ function isTimelineImage(image: unknown): image is TimelineImage {
   if (!image || typeof image !== 'object') return false
   const img = image as Record<string, unknown>
   return (
-    typeof img.url === 'string' && (img.caption === undefined || typeof img.caption === 'string')
+    typeof img.url === 'string' && 
+    typeof img.originalUrl === 'string' && 
+    (img.caption === undefined || typeof img.caption === 'string')
   )
 }
 
@@ -100,7 +103,7 @@ export default function TimelineModal({
           onClick={onClose}
           aria-label="Close modal"
         >
-          ×
+          <CloseIcon style={{fontSize: '18px'}} />
         </button>
 
         <div className={styles['modal-date']}>{selectedEntry.date}</div>

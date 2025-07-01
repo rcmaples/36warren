@@ -1,6 +1,7 @@
 // Legacy interfaces for backward compatibility
 export interface TimelineImage {
   url: string
+  originalUrl: string
   caption: string
 }
 
