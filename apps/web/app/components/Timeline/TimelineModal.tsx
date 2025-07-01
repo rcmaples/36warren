@@ -91,7 +91,7 @@ export default function TimelineModal({
       onClick={handleOverlayClick}
     >
       <div
-        className={`${styles['modal-content']} relative max-w-5xl w-full max-h-[90vh] overflow-y-auto rounded-lg p-8`}
+        className={`${styles['modal-content']} relative max-w-5xl w-full rounded-lg p-8`}
         onClick={(e) => e.stopPropagation()}
       >
         <button
