@@ -3,7 +3,7 @@
 import {useCallback, useEffect, useMemo, useState} from 'react'
 
 import {processSanityEntry} from '@/lib/data'
-import type {TimelineEntry, ViewType, ExecutiveSummaryData} from '@/lib/types'
+import type {ExecutiveSummaryData, TimelineEntry, ViewType} from '@/lib/types'
 
 import ExecutiveSummary from './ExecutiveSummary'
 import styles from './Timeline.module.css'
