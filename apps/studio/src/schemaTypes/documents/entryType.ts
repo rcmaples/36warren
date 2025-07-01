@@ -7,12 +7,20 @@ export const entryType = defineType({
   type: 'document',
   description: 'A record or log entry that can be associated with one or more people',
   icon: DocumentTextIcon,
+  groups: [
+    {
+      name: 'content',
+      title: 'Content',
+      default: true,
+    },
+  ],
   fields: [
     defineField({
       name: 'name',
       title: 'Name',
       type: 'string',
       description: 'Title or name of the entry',
+      group: 'content',
       validation: (Rule) =>
         Rule.required().min(2).max(100).error('Name must be between 2 and 100 characters'),
     }),
@@ -21,6 +29,7 @@ export const entryType = defineType({
       title: 'Date',
       type: 'date',
       description: 'When this entry occurred',
+      group: 'content',
       initialValue: new Date().toISOString().slice(0, 10),
       validation: (Rule) => Rule.required().error('Date is required'),
     }),
@@ -29,6 +38,7 @@ export const entryType = defineType({
       title: 'Short Description',
       type: 'string',
       description: 'Brief summary of the entry (max 200 characters)',
+      group: 'content',
       validation: (Rule) =>
         Rule.required()
           .min(2)
@@ -39,12 +49,14 @@ export const entryType = defineType({
       name: 'fullDescription',
       title: 'Full Description',
       type: 'array',
+      group: 'content',
       of: [{type: 'block'}],
     }),
     defineField({
       name: 'people',
       title: 'People',
       type: 'array',
+      group: 'content',
       description: 'People associated with this entry',
       validation: (Rule) => Rule.required().min(1).error('At least one person is required'),
       of: [
@@ -61,6 +73,7 @@ export const entryType = defineType({
       name: 'gallery',
       title: 'Gallery',
       type: 'array',
+      group: 'content',
       of: [defineArrayMember({type: 'imageWithAlt'})],
       options: {
         layout: 'grid',
@@ -70,6 +83,7 @@ export const entryType = defineType({
       name: 'supportingDocuments',
       title: 'Supporting Documents',
       type: 'array',
+      group: 'content',
       of: [
         {
           type: 'file',
@@ -95,6 +109,7 @@ export const entryType = defineType({
       name: 'impact',
       title: 'Impact Level',
       type: 'string',
+      group: 'content',
       description: 'The impact level of this entry (optional)',
       options: {
         list: [
