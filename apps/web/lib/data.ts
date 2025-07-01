@@ -16,7 +16,7 @@ export function formatEntryDate(dateString: string): string {
 function convertSanityImageToTimelineImage(sanityImage: {
   asset?: {_ref?: string}
   alt?: string
-}): {url: string; caption: string} | null {
+}): {url: string; originalUrl: string; caption: string} | null {
   if (!sanityImage?.asset?._ref) {
     return null
   }
@@ -34,7 +34,8 @@ function convertSanityImageToTimelineImage(sanityImage: {
       const baseUrl = `https://cdn.sanity.io/images/${projectId}/${dataset}/${id}-${dimensions}.${format}`
 
       return {
-        url: `${baseUrl}?w=800&h=600&fit=max&auto=format`,
+        url: `${baseUrl}?w=800&h=600&fit=max&auto=format`, // Display URL (resized)
+        originalUrl: baseUrl, // Original full-resolution URL
         caption: sanityImage.alt || '',
       }
     }

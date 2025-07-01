@@ -38,6 +38,7 @@ export const convertSanityImageToTimelineImage = (
 
     return {
       url: imageBuilder.url(),
+      originalUrl: urlFor(sanityImage.asset).url(),
       caption: sanityImage.alt || '',
     }
   } catch (error) {

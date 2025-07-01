@@ -57,6 +57,12 @@ export const ENTRY_QUERY = defineQuery(`
   }
 `)
 
+export const ENTRY_BY_ID_QUERY = defineQuery(`
+  *[_type == "entry" && _id == $id][0] {
+    ${ENTRY_FIELDS_QUERY}
+  }
+`)
+
 // Legacy blog post queries (keeping for backward compatibility)
 const POST_FIELDS_QUERY = /* groq */ `
   _id,

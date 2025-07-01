@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
         pathname: '/images/**',
       },
     ],
-    unoptimized: true,
+    // unoptimized: true,
   },
 }
 
