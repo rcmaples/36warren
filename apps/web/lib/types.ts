@@ -25,6 +25,9 @@ export interface SanityImage {
   }
 }
 
+// Use the official PortableText types from @portabletext/types
+import type {PortableTextBlock} from '@portabletext/types'
+
 export interface SanityPerson {
   _id: string
   name: string
@@ -39,7 +42,7 @@ export interface TimelineEntry {
   name: string
   date: string
   shortDescription: string
-  fullDescription: string
+  fullDescription: PortableTextBlock[]
   impact?: 'low' | 'medium' | 'high' | 'critical'
   gallery?: SanityImage[]
   people?: SanityPerson[]

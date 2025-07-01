@@ -2,6 +2,7 @@ import {useCallback, useEffect} from 'react'
 
 import type {TimelineEntry, TimelineImage} from '@/lib/types'
 
+import PortableText from '../PortableText'
 import ImageCarousel from './ImageCarousel'
 import styles from './Timeline.module.css'
 
@@ -107,7 +108,9 @@ export default function TimelineModal({
 
         {hasImages && <ImageCarousel images={entryImages} />}
 
-        <p className={styles['modal-description']}>{selectedEntry.fullDescription}</p>
+        <div className={styles['modal-description']}>
+          <PortableText value={selectedEntry.fullDescription || []} />
+        </div>
       </div>
     </div>
   )
