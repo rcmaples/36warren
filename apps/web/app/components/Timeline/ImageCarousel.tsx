@@ -1,6 +1,6 @@
+import {ChevronLeftIcon, ChevronRightIcon} from '@sanity/icons'
 import Image from 'next/image'
 import React, {useCallback, useEffect, useState} from 'react'
-import {ChevronLeftIcon, ChevronRightIcon} from '@sanity/icons'
 
 import type {TimelineImage} from '@/lib/types'
 
