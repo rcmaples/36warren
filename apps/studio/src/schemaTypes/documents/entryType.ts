@@ -45,6 +45,12 @@ export const entryType = defineType({
       rows: 5,
     }),
     defineField({
+      name: 'fullDescriptionPT',
+      title: 'Full Description Portable Text',
+      type: 'array',
+      of: [{type: 'block'}],
+    }),
+    defineField({
       name: 'people',
       title: 'People',
       type: 'array',
