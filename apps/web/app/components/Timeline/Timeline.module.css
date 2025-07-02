@@ -458,6 +458,22 @@
     font-size: 1rem;
   }
 
+  /* Fix folder tabs on mobile */
+  .folder-tabs {
+    margin-left: 1rem !important; /* Add left spacing from viewport edge */
+    margin-top: 15px !important;
+    justify-content: center !important;
+    gap: 4px !important; /* Revert back to original 4px */
+  }
+
+  .folder-tab {
+    padding: 4px 8px !important;
+    font-size: 0.7rem !important;
+    height: 28px !important;
+    white-space: nowrap !important;
+    min-width: 0 !important;
+  }
+
   .timeline-card {
     width: 90% !important;
     margin-left: auto !important;
@@ -496,6 +512,32 @@
 
   .modal-description {
     font-size: 1rem;
+  }
+}
+
+/* Small mobile screens (iPhone SE, etc.) */
+@media (max-width: 480px) {
+  .banner-title {
+    font-size: 1.5rem;
+    letter-spacing: 0.5px;
+  }
+
+  .banner-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .folder-tabs {
+    margin-left: 0.75rem !important; /* Smaller left spacing for very small screens */
+    margin-top: 10px !important;
+    justify-content: center !important;
+    gap: 4px !important; /* Keep consistent gap */
+  }
+
+  .folder-tab {
+    padding: 3px 6px !important;
+    font-size: 0.65rem !important;
+    height: 24px !important;
+    letter-spacing: 0.25px !important;
   }
 }
 
