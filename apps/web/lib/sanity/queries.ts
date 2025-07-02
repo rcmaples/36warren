@@ -20,10 +20,21 @@ export const EXEC_SUMMARY_QUERY = defineQuery(`
 const ENTRY_FIELDS_QUERY = /* groq */ `
   _id,
   name,
+  slug,
   date,
   shortDescription,
   fullDescription,
   impact,
+  seo {
+    metaTitle,
+    metaDescription,
+    keywords
+  },
+  location {
+    address,
+    coordinates,
+    relatedAreas
+  },
   gallery[] {
     asset,
     alt,

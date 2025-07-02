@@ -2,21 +2,40 @@ import {ArrowLeft} from 'lucide-react'
 import type {Metadata} from 'next'
 import Link from 'next/link'
 
+import {generateOGImageURL, OG_CONFIGS} from '../../lib/og/utils'
 import {sanityFetch} from '../../lib/sanity/live'
 import {EXEC_SUMMARY_QUERY, SETTINGS_QUERY} from '../../lib/sanity/queries'
 import type {ExecutiveSummaryData as ImportedExecutiveSummaryData} from '../../lib/types'
+import StructuredData from '../components/StructuredData'
 import ExecutiveSummary from '../components/Timeline/ExecutiveSummary'
 import styles from '../components/Timeline/Timeline.module.css'
 
 export const metadata: Metadata = {
-  title: 'Executive Summary | Storm Drain Investigation',
+  title: 'Executive Summary | 36 Warren Street Storm Drain Investigation',
   description:
-    'Comprehensive executive summary of the storm drain investigation findings and municipal negligence documentation.',
+    'Comprehensive executive summary of the 36 Warren Street NE storm drain investigation findings and municipal negligence documentation.',
+  keywords:
+    '36 warren street, storm drain investigation, executive summary, municipal negligence, infrastructure failure',
   openGraph: {
-    title: 'Executive Summary | Storm Drain Investigation',
+    title: 'Executive Summary | 36 Warren Street Storm Drain Investigation',
     description:
-      'Comprehensive executive summary of the storm drain investigation findings and municipal negligence documentation.',
+      'Comprehensive executive summary of the 36 Warren Street NE storm drain investigation findings and municipal negligence documentation.',
     type: 'article',
+    images: [
+      {
+        url: generateOGImageURL(OG_CONFIGS.summary),
+        width: 1200,
+        height: 630,
+        alt: 'Executive Summary - 36 Warren Street Storm Drain Investigation',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Executive Summary | 36 Warren Street Storm Drain Investigation',
+    description:
+      'Comprehensive executive summary of the 36 Warren Street NE storm drain investigation findings.',
+    images: [generateOGImageURL(OG_CONFIGS.summary)],
   },
 }
 
@@ -94,6 +113,11 @@ export default async function SummaryPage() {
 
     return (
       <div className="min-h-screen relative overflow-hidden">
+        <StructuredData
+          type="article"
+          title="Executive Summary | 36 Warren Street Storm Drain Investigation"
+          description="Comprehensive executive summary of the 36 Warren Street NE storm drain investigation findings and municipal negligence documentation."
+        />
         {/* Background */}
         <div className={`${styles['investigation-bg']} fixed inset-0 -z-10`} />
 
