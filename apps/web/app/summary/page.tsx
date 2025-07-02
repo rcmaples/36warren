@@ -2,6 +2,7 @@ import {ArrowLeft} from 'lucide-react'
 import type {Metadata} from 'next'
 import Link from 'next/link'
 
+import {generateOGImageURL, OG_CONFIGS} from '../../lib/og/utils'
 import {sanityFetch} from '../../lib/sanity/live'
 import {EXEC_SUMMARY_QUERY, SETTINGS_QUERY} from '../../lib/sanity/queries'
 import type {ExecutiveSummaryData as ImportedExecutiveSummaryData} from '../../lib/types'
@@ -20,12 +21,21 @@ export const metadata: Metadata = {
     description:
       'Comprehensive executive summary of the 36 Warren Street NE storm drain investigation findings and municipal negligence documentation.',
     type: 'article',
+    images: [
+      {
+        url: generateOGImageURL(OG_CONFIGS.summary),
+        width: 1200,
+        height: 630,
+        alt: 'Executive Summary - 36 Warren Street Storm Drain Investigation',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Executive Summary | 36 Warren Street Storm Drain Investigation',
     description:
       'Comprehensive executive summary of the 36 Warren Street NE storm drain investigation findings.',
+    images: [generateOGImageURL(OG_CONFIGS.summary)],
   },
 }
 

@@ -1,4 +1,6 @@
 /** @type {import('next-sitemap').IConfig} */
+import {getAbsoluteOGImageURL, OG_CONFIGS} from './lib/og/utils.js'
+
 export default {
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://36warren.com',
   generateRobotsTxt: false, // We have custom robots.txt
@@ -26,7 +28,7 @@ export default {
         lastmod: new Date().toISOString(),
         images: [
           {
-            loc: 'https://36warren.com/og-image.jpg',
+            loc: getAbsoluteOGImageURL(OG_CONFIGS.home),
             title: '36 Warren Street Storm Drain Investigation',
             caption: 'Documentation of municipal infrastructure failure',
           },
@@ -43,7 +45,7 @@ export default {
         lastmod: new Date().toISOString(),
         images: [
           {
-            loc: 'https://36warren.com/summary-og-image.jpg',
+            loc: getAbsoluteOGImageURL(OG_CONFIGS.summary),
             title: 'Executive Summary - 36 Warren Street Investigation',
           },
         ],

@@ -2,10 +2,12 @@ import './globals.css'
 
 import type {Metadata} from 'next'
 
+import {generateOGImageURL, OG_CONFIGS} from '../lib/og/utils'
 import {SanityLive} from '../lib/sanity/live'
 import StructuredData from './components/StructuredData'
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://36warren.com'),
   title: '36 Warren Street Storm Drain Investigation | Municipal Infrastructure Failure',
   description:
     'Comprehensive timeline documenting storm drain infrastructure failure at 36 Warren Street NE, Atlanta, flooding incidents, and negligent city response.',
@@ -43,7 +45,7 @@ export const metadata: Metadata = {
     siteName: '36 Warren Street Investigation',
     images: [
       {
-        url: '/og-image.jpg',
+        url: generateOGImageURL(OG_CONFIGS.home),
         width: 1200,
         height: 630,
         alt: '36 Warren Street Storm Drain Investigation Documentation',
@@ -56,7 +58,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: '36 Warren Street Storm Drain Investigation',
     description: 'Documentation of municipal storm drain failure at 36 Warren Street NE, Atlanta',
-    images: ['/og-image.jpg'],
+    images: [generateOGImageURL(OG_CONFIGS.home)],
   },
 
   // Favicons and icons

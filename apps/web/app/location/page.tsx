@@ -2,6 +2,7 @@ import {ArrowLeft} from 'lucide-react'
 import type {Metadata} from 'next'
 import Link from 'next/link'
 
+import {generateOGImageURL, OG_CONFIGS} from '../../lib/og/utils'
 import StructuredData from '../components/StructuredData'
 import styles from '../components/Timeline/Timeline.module.css'
 
@@ -16,12 +17,21 @@ export const metadata: Metadata = {
     description:
       'Location details and history of storm drain infrastructure failure at 36 Warren Street NE, Atlanta',
     type: 'website',
+    images: [
+      {
+        url: generateOGImageURL(OG_CONFIGS.location),
+        width: 1200,
+        height: 630,
+        alt: '36 Warren Street NE - Storm Drain Infrastructure Failure Location',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: '36 Warren Street NE - Storm Drain Infrastructure Failure Location',
     description:
       'Location details and history of storm drain infrastructure failure at 36 Warren Street NE, Atlanta',
+    images: [generateOGImageURL(OG_CONFIGS.location)],
   },
 }
 
