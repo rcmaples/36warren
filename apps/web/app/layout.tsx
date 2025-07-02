@@ -99,8 +99,10 @@ export default function RootLayout({
         <meta name="theme-color" content="#000000" />
         <meta name="msapplication-TileColor" content="#000000" />
 
-        {/* Add Google Search Console verification when available */}
-        {/* <meta name="google-site-verification" content="your-verification-code" /> */}
+        <meta
+          name="google-site-verification"
+          content="google-site-verification=lEcie86wx1plrfLAZdtoDKZe8vNrE3T-PAvlGMrLCKI"
+        />
       </head>
       <body className="antialiased">
         {/* Skip navigation for accessibility */}
