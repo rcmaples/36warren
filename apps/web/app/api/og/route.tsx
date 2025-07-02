@@ -1,16 +1,18 @@
 import {ImageResponse} from '@vercel/og'
-import {NextRequest} from 'next/server'
+import type {NextRequest} from 'next/server'
 
 export const runtime = 'edge'
 
 export async function GET(request: NextRequest) {
   try {
     const {searchParams} = new URL(request.url)
-    
+
     // Get parameters from URL
     const title = searchParams.get('title') || '36 Warren Street Storm Drain Investigation'
     const subtitle = searchParams.get('subtitle') || 'Municipal Infrastructure Failure'
-    const description = searchParams.get('description') || 'Documentation of municipal storm drain failure and negligent city response'
+    const description =
+      searchParams.get('description') ||
+      'Documentation of municipal storm drain failure and negligent city response'
     const type = searchParams.get('type') || 'investigation'
     const location = searchParams.get('location') || 'Atlanta, Georgia'
 
@@ -18,7 +20,8 @@ export async function GET(request: NextRequest) {
     const debug = searchParams.get('debug') === 'true'
 
     if (debug) {
-      return new Response(`
+      return new Response(
+        `
         <!DOCTYPE html>
         <html>
           <head>
@@ -97,9 +100,11 @@ export async function GET(request: NextRequest) {
             <code>&lt;meta property="og:image" content="${request.url.split('?')[0]}?title=36%20Warren%20Street&type=investigation" /&gt;</code>
           </body>
         </html>
-      `, {
-        headers: { 'Content-Type': 'text/html' },
-      })
+      `,
+        {
+          headers: {'Content-Type': 'text/html'},
+        },
+      )
     }
 
     return new ImageResponse(
@@ -122,22 +127,8 @@ export async function GET(request: NextRequest) {
               left: 0,
               width: '100%',
               height: '100%',
-              backgroundImage: `
-                repeating-linear-gradient(
-                  0deg,
-                  rgba(59, 130, 246, 0.05),
-                  rgba(59, 130, 246, 0.05) 1px,
-                  transparent 1px,
-                  transparent 50px
-                ),
-                repeating-linear-gradient(
-                  90deg,
-                  rgba(59, 130, 246, 0.05),
-                  rgba(59, 130, 246, 0.05) 1px,
-                  transparent 1px,
-                  transparent 50px
-                )
-              `,
+              backgroundImage:
+                'repeating-linear-gradient(0deg, rgba(59, 130, 246, 0.05), rgba(59, 130, 246, 0.05) 1px, transparent 1px, transparent 50px), repeating-linear-gradient(90deg, rgba(59, 130, 246, 0.05), rgba(59, 130, 246, 0.05) 1px, transparent 1px, transparent 50px)',
             }}
           />
 
@@ -184,7 +175,7 @@ export async function GET(request: NextRequest) {
                   boxShadow: '0 10px 25px rgba(59, 130, 246, 0.3)',
                 }}
               >
-                {/* Simple house icon since complex SVG may not work */}
+                {/* Simple house icon */}
                 <div
                   style={{
                     width: '40px',
@@ -291,8 +282,9 @@ export async function GET(request: NextRequest) {
       {
         width: 1200,
         height: 630,
-      }
+      },
     )
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (e: any) {
     console.log(`OG Image generation error: ${e.message}`)
     return new Response(`Failed to generate the image: ${e.message}`, {
