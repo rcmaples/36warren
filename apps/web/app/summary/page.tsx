@@ -8,7 +8,6 @@ import {EXEC_SUMMARY_QUERY, SETTINGS_QUERY} from '../../lib/sanity/queries'
 import type {ExecutiveSummaryData as ImportedExecutiveSummaryData} from '../../lib/types'
 import StructuredData from '../components/StructuredData'
 import ExecutiveSummary from '../components/Timeline/ExecutiveSummary'
-import styles from '../components/Timeline/Timeline.module.css'
 
 export const metadata: Metadata = {
   title: 'Executive Summary | 36 Warren Street Storm Drain Investigation',
@@ -119,23 +118,23 @@ export default async function SummaryPage() {
           description="Comprehensive executive summary of the 36 Warren Street NE storm drain investigation findings and municipal negligence documentation."
         />
         {/* Background */}
-        <div className={`${styles['investigation-bg']} fixed inset-0 -z-10`} />
+        <div className="investigation-bg fixed inset-0 -z-10" />
 
         {/* Header with integrated tabs */}
-        <header className={`${styles.banner} fixed top-0 left-0 right-0 z-40 px-4 py-6`}>
+        <header className="banner fixed top-0 left-0 right-0 z-40 px-4 py-6">
           <div className="max-w-6xl mx-auto text-center">
-            <h1 className={styles['banner-title']}>
+            <h1 className="banner-title">
               {(settings as {title?: string})?.title || 'STORM DRAIN INVESTIGATION'}
             </h1>
-            <p className={styles['banner-subtitle']}>
+            <p className="banner-subtitle">
               {getDescriptionText((settings as {description?: unknown})?.description) ||
                 'Municipal Negligence Documentation'}
             </p>
 
-            <nav className={styles['folder-tabs']} role="tablist" aria-label="View selection">
+            <nav className="folder-tabs" role="tablist" aria-label="View selection">
               <Link
                 href="/"
-                className={`${styles['folder-tab']}`}
+                className="folder-tab"
                 role="tab"
                 aria-selected={false}
                 aria-controls="timeline-content"
@@ -143,7 +142,7 @@ export default async function SummaryPage() {
                 Timeline
               </Link>
               <button
-                className={`${styles['folder-tab']} ${styles.active}`}
+                className="folder-tab active"
                 role="tab"
                 aria-selected={true}
                 aria-controls="summary-content"
@@ -168,7 +167,7 @@ export default async function SummaryPage() {
     return (
       <div className="min-h-screen relative overflow-hidden">
         {/* Background */}
-        <div className={`${styles['investigation-bg']} fixed inset-0 -z-10`} />
+        <div className="investigation-bg fixed inset-0 -z-10" />
 
         <div className="relative max-w-7xl mx-auto px-4 py-20">
           <Link

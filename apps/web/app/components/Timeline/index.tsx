@@ -9,6 +9,7 @@ import type {TimelineEntry} from '@/lib/types'
 import styles from './Timeline.module.css'
 import TimelineItem from './TimelineItem'
 import TimelineModal from './TimelineModal'
+import YearNavigation from './YearNavigation'
 
 interface TimelineProps {
   initialEntries: unknown[]
@@ -140,15 +141,26 @@ export default function Timeline({initialEntries, initialSettings}: TimelineProp
     router.push('/summary')
   }, [router])
 
+  // Handle year navigation clicks
+  const handleYearClick = useCallback((year: string) => {
+    console.log(`Navigated to year: ${year}`)
+    // You can add analytics or other side effects here
+  }, [])
+
   const memoizedTimelineItems = useMemo(() => {
-    return timelineData.map((item, index) => (
-      <TimelineItem
-        key={item._id || `${item.date}-${index}`}
-        item={item}
-        index={index}
-        onOpenModal={openModal}
-      />
-    ))
+    return timelineData.map((item, index) => {
+      const itemYear = new Date(item.date).getFullYear().toString()
+
+      return (
+        <div
+          key={item._id || `${item.date}-${index}`}
+          data-timeline-id={item._id}
+          data-year={itemYear}
+        >
+          <TimelineItem item={item} index={index} onOpenModal={openModal} />
+        </div>
+      )
+    })
   }, [timelineData, openModal])
 
   if (!mounted) {
@@ -192,6 +204,9 @@ export default function Timeline({initialEntries, initialSettings}: TimelineProp
           </nav>
         </div>
       </header>
+
+      {/* Year Navigation Component */}
+      <YearNavigation timelineData={timelineData} onYearClick={handleYearClick} />
 
       {/* Main Content Area - Timeline */}
       <main

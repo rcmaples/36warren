@@ -6,6 +6,139 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Shared styles for Timeline and Summary pages */
+.investigation-bg {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+}
+
+.banner {
+  background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+  border-bottom: 3px solid #dc2626;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+  padding-bottom: 40px;
+}
+
+.banner-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  letter-spacing: 1px;
+  font-family: 'Arial Black', sans-serif;
+}
+
+.banner-subtitle {
+  color: #dc2626;
+  font-size: 1.2rem;
+  margin-top: 8px;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.folder-tabs {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-start;
+  margin-top: 20px;
+  margin-left: 100px;
+  z-index: 10;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.folder-tab {
+  background: transparent;
+  border: 2px solid #dc2626;
+  border-bottom: none;
+  color: #ffffff;
+  padding: 6px 16px;
+  border-radius: 6px 6px 0 0;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.8rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.folder-tab:hover {
+  background: rgba(220, 38, 38, 0.1);
+}
+
+.folder-tab.active {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #ffffff;
+}
+
+.folder-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #dc2626;
+}
+
+/* Mobile responsive styles for banner */
+@media (max-width: 768px) {
+  .banner-title {
+    font-size: 1.8rem;
+  }
+
+  .banner-subtitle {
+    font-size: 1rem;
+  }
+
+  .folder-tabs {
+    margin-left: 1rem !important;
+    margin-top: 15px !important;
+    justify-content: center !important;
+    gap: 4px !important;
+  }
+
+  .folder-tab {
+    padding: 4px 8px !important;
+    font-size: 0.7rem !important;
+    height: 28px !important;
+    white-space: nowrap !important;
+    min-width: 0 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .banner-title {
+    font-size: 1.5rem;
+    letter-spacing: 0.5px;
+  }
+
+  .banner-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .folder-tabs {
+    margin-left: 0.75rem !important;
+    margin-top: 10px !important;
+    justify-content: center !important;
+    gap: 4px !important;
+  }
+
+  .folder-tab {
+    padding: 3px 6px !important;
+    font-size: 0.65rem !important;
+    height: 24px !important;
+    letter-spacing: 0.25px !important;
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
