@@ -46,6 +46,7 @@ next-env.d.ts
 # production
 /build
 .pnpm-debug.log*
+apps/web/public/sitemap.xml
 
 # Logs
 /logs
