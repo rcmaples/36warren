@@ -39,6 +39,8 @@ export default async function Page() {
     const entries = entriesResult.data || entriesResult
     const settings = settingsResult.data || settingsResult
 
+    console.log('env:', process.env)
+
     return (
       <ErrorBoundary>
         <div style={{marginTop: '48px'}}>

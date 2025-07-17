@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
       },
     ],
     // Disable image optimization for Netlify deployment
-    unoptimized: process.env.NETLIFY === 'true',
+    unoptimized: true,
   },
 
   // Performance optimizations
