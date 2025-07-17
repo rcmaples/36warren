@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@netlify/plugin-nextjs": "^5.11.6",
     "@portabletext/react": "^3.2.1",
     "@portabletext/types": "^2.0.13",
     "@sanity/icons": "^3.7.4",
