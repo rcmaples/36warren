@@ -10,7 +10,8 @@ const nextConfig: NextConfig = {
         pathname: '/images/**',
       },
     ],
-    // unoptimized: true,
+    // Disable image optimization for Netlify deployment
+    unoptimized: process.env.NETLIFY === 'true',
   },
 
   // Performance optimizations
