@@ -1,8 +1,0 @@
-[build]
-base = "/"
-command = "turbo run build --filter web"
-publish = ".next"
-functions = "netlify/functions"
-
-[[plugins]]
-package = "@netlify/plugin-nextjs"
