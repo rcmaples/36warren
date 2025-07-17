@@ -12,12 +12,6 @@ interface YearNavigationProps {
   onYearClick?: (year: string) => void
 }
 
-interface YearSection {
-  year: string
-  count: number
-  firstEntryId: string
-}
-
 export default function YearNavigation({timelineData, onYearClick}: YearNavigationProps) {
   const [activeYear, setActiveYear] = useState<string>('')
   const [isExpanded, setIsExpanded] = useState(false)
